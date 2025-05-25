@@ -1,0 +1,378 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <div class="user-info">
+      <div class="avatar"></div>
+      <h1>Welcome, Admin</h1>
+    </div>
+    <button class="btn-primary" (click)="openCreateEventModal()" type="button">
+      <i class="fas fa-plus"></i> Create event
+    </button>
+  </div>
+</header>
+
+<!-- Navigation -->
+<nav class="navigation">
+  <div class="nav-item" 
+       [class.active]="activeTab === 'dashboard'" 
+       (click)="setActiveTab('dashboard')"
+       role="button"
+       tabindex="0"
+       (keydown.enter)="setActiveTab('dashboard')"
+       (keydown.space)="setActiveTab('dashboard')">
+    <i class="fas fa-chart-pie"></i> Dashboard
+  </div>
+  <div class="nav-item" 
+       [class.active]="activeTab === 'tickets'" 
+       (click)="setActiveTab('tickets')"
+       role="button"
+       tabindex="0"
+       (keydown.enter)="setActiveTab('tickets')"
+       (keydown.space)="setActiveTab('tickets')">
+    <i class="fas fa-ticket-alt"></i> Tickets
+  </div>
+  <div class="nav-item" 
+       [class.active]="activeTab === 'validation'" 
+       (click)="setActiveTab('validation')"
+       role="button"
+       tabindex="0"
+       (keydown.enter)="setActiveTab('validation')"
+       (keydown.space)="setActiveTab('validation')">
+    <i class="fas fa-check-circle"></i> Validation
+  </div>
+</nav>
+
+<!-- Dashboard Content -->
+<main class="main-content">
+  <!-- Dashboard Tab -->
+  <div *ngIf="activeTab === 'dashboard'" class="tab-content" role="tabpanel" aria-labelledby="dashboard-tab">
+    <!-- Event Card -->
+    <div class="event-card" *ngIf="currentEvent.name !== 'No Event Selected'">
+      <div class="event-header">
+        <div class="event-info">
+          <h2>{{ currentEvent.name }}</h2>
+          <p><strong>ID:</strong> {{ currentEvent.id }}</p>
+          <p><strong>Count:</strong> {{ currentEvent.totalCount }}</p>
+          <p class="limits"><strong>Limits:</strong> {{ currentEvent.limits }}</p>
+        </div>
+        <div class="event-actions">
+          <button class="btn-icon" 
+                  (click)="deleteEvent()" 
+                  type="button"
+                  title="Delete Event"
+                  aria-label="Delete Event">
+            <i class="fas fa-trash"></i>
+          </button>
+          <button class="btn-icon" 
+                  (click)="editEvent()" 
+                  type="button"
+                  title="Edit Event"
+                  aria-label="Edit Event">
+            <i class="fas fa-edit"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Event Message -->
+    <div *ngIf="currentEvent.name === 'No Event Selected'" class="no-event-card">
+      <h2>No Event Selected</h2>
+      <p>Create a new event to get started</p>
+      <button class="btn-primary" (click)="openCreateEventModal()" type="button">
+        <i class="fas fa-plus"></i> Create Your First Event
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid" *ngIf="currentEvent.name !== 'No Event Selected'">
+      <div class="stat-card">
+        <h3>Total sales Revenue</h3>
+        <p class="stat-value">{{ dashboardStats.totalRevenue }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Ticket sales</h3>
+        <p class="stat-value">{{ dashboardStats.ticketSales }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Available tickets</h3>
+        <p class="stat-value">{{ dashboardStats.availableTickets }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tickets Tab -->
+  <div *ngIf="activeTab === 'tickets'" class="tab-content" role="tabpanel" aria-labelledby="tickets-tab">
+    <!-- Ticket Stats -->
+    <div class="ticket-stats">
+      <div class="stat-card">
+        <h3>Ticket sales</h3>
+        <span class="stat-number">{{ ticketStats.sales }}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Available tickets</h3>
+        <span class="stat-number">{{ ticketStats.available }}</span>
+      </div>
+      <button class="btn-primary generate-btn" 
+              (click)="openGenerateTicketModal()" 
+              type="button"
+              [disabled]="currentEvent.name === 'No Event Selected'">
+        Generate Ticket
+      </button>
+    </div>
+
+    <!-- Ticket Actions -->
+    <div class="ticket-actions" *ngIf="tickets.length > 0">
+      <button class="btn-outline" (click)="selectAllTickets()" type="button">
+        {{ getSelectedTicketsCount() === tickets.length ? 'Deselect All' : 'Select All' }}
+      </button>
+      <button class="btn-danger" 
+              (click)="deleteSelectedTickets()" 
+              type="button"
+              [disabled]="getSelectedTicketsCount() === 0">
+        Delete Selected ({{ getSelectedTicketsCount() }})
+      </button>
+    </div>
+
+    <!-- Tickets Table -->
+    <div class="table-container" *ngIf="tickets.length > 0; else noTickets">
+      <table class="data-table" role="table">
+        <thead>
+          <tr>
+            <th scope="col">Ticket Id</th>
+            <th scope="col">Event</th>
+            <th scope="col">Name</th>
+            <th scope="col">Category</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ticket of tickets; trackBy: trackByTicketId">
+            <td>{{ ticket.id }}</td>
+            <td>{{ ticket.event }}</td>
+            <td>{{ ticket.name }}</td>
+            <td>{{ ticket.category }}</td>
+            <td>
+              <span class="status-badge" [class]="'status-' + ticket.status.toLowerCase()">
+                {{ ticket.status }}
+              </span>
+            </td>
+            <td>
+              <input type="checkbox" 
+                     [(ngModel)]="ticket.selected"
+                     [attr.aria-label]="'Select ticket ' + ticket.id">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noTickets>
+      <div class="no-data">
+        <i class="fas fa-ticket-alt"></i>
+        <h3>No Tickets Found</h3>
+        <p>Generate tickets to see them here</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Validation Tab -->
+  <div *ngIf="activeTab === 'validation'" class="tab-content" role="tabpanel" aria-labelledby="validation-tab">
+    <!-- Validation Stats -->
+    <div class="validation-stats">
+      <div class="stat-card">
+        <h3>Active Tickets</h3>
+        <span class="stat-number">{{ validationStats.activeTickets }}</span>
+      </div>
+      <div class="stat-card">
+        <h3>Participants</h3>
+        <span class="stat-number">{{ validationStats.participants }}</span>
+      </div>
+      <div class="validation-controls">
+        <button class="btn-outline" type="button">All</button>
+        <button class="btn-primary" 
+                (click)="validateTicket()" 
+                type="button"
+                [disabled]="!ticketIdToValidate.trim()">
+          Check
+        </button>
+      </div>
+    </div>
+
+    <!-- Ticket ID Input -->
+    <div class="ticket-id-input">
+      <label for="ticketIdInput" class="sr-only">Enter Ticket ID to validate</label>
+      <input type="text" 
+             id="ticketIdInput"
+             placeholder="Ticket Id" 
+             [(ngModel)]="ticketIdToValidate" 
+             class="input-field"
+             (keydown.enter)="validateTicket()">
+    </div>
+
+    <!-- Validation Table -->
+    <div class="table-container" *ngIf="validationTickets.length > 0; else noValidationTickets">
+      <table class="data-table" role="table">
+        <thead>
+          <tr>
+            <th scope="col">Ticket Id</th>
+            <th scope="col">Event</th>
+            <th scope="col">Name</th>
+            <th scope="col">Category</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ticket of validationTickets; trackBy: trackByTicketId">
+            <td>{{ ticket.id }}</td>
+            <td>{{ ticket.event }}</td>
+            <td>{{ ticket.name }}</td>
+            <td>{{ ticket.category }}</td>
+            <td>
+              <span class="status-badge" [class]="'status-' + ticket.status.toLowerCase()">
+                {{ ticket.status }}
+              </span>
+            </td>
+            <td>
+              <input type="checkbox" 
+                     [(ngModel)]="ticket.selected"
+                     [attr.aria-label]="'Select ticket ' + ticket.id">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noValidationTickets>
+      <div class="no-data">
+        <i class="fas fa-check-circle"></i>
+        <h3>No Tickets to Validate</h3>
+        <p>Generate tickets first to validate them</p>
+      </div>
+    </ng-template>
+  </div>
+</main>
+
+<!-- Generate Ticket Modal -->
+<div *ngIf="showGenerateModal" 
+     class="modal-overlay" 
+     (click)="onModalOverlayClick($event)"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="generate-modal-title">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2 id="generate-modal-title">Generate Tickets</h2>
+    <form (ngSubmit)="generateTickets()" #generateTicketForm="ngForm">
+      <div class="form-group">
+        <label for="categorySelect">Category</label>
+        <select [(ngModel)]="generateForm.category" 
+                name="category"
+                id="categorySelect"
+                class="input-field" 
+                required>
+          <option value="">Select category</option>
+          <option value="VVIP">VVIP</option>
+          <option value="VIP">VIP</option>
+          <option value="General">General</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="countInput">Count</label>
+        <input type="number" 
+               [(ngModel)]="generateForm.count" 
+               name="count"
+               id="countInput"
+               placeholder="Count" 
+               class="input-field" 
+               min="1"
+               max="1000"
+               required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" (click)="closeGenerateModal()">
+          Cancel
+        </button>
+        <button type="submit" 
+                class="btn-primary"
+                [disabled]="!generateTicketForm.form.valid">
+          Generate Ticket
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Create Event Modal -->
+<div *ngIf="showCreateEventModal" 
+     class="modal-overlay" 
+     (click)="onModalOverlayClick($event)"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="create-event-modal-title">
+  <div class="modal create-event-modal" (click)="$event.stopPropagation()">
+    <h2 id="create-event-modal-title">Create New Event</h2>
+    <form (ngSubmit)="createEvent()" #createEventForm="ngForm">
+      <div class="form-group">
+        <label for="eventNameInput">Event Name</label>
+        <input type="text" 
+               [(ngModel)]="eventForm.name" 
+               name="eventName"
+               id="eventNameInput"
+               placeholder="Enter Name" 
+               class="input-field" 
+               required
+               maxlength="100">
+      </div>
+      
+      <div class="tickets-section">
+        <h3>Tickets</h3>
+        <div class="ticket-category" *ngFor="let category of eventForm.categories; let i = index">
+          <div class="category-row">
+            <input type="text" 
+                   [(ngModel)]="category.name" 
+                   [name]="'categoryName' + i"
+                   placeholder="Category" 
+                   class="input-field"
+                   maxlength="50">
+            <input type="number" 
+                   [(ngModel)]="category.price" 
+                   [name]="'categoryPrice' + i"
+                   placeholder="Price" 
+                   class="input-field"
+                   min="0"
+                   step="0.01">
+            <input type="number" 
+                   [(ngModel)]="category.count" 
+                   [name]="'categoryCount' + i"
+                   placeholder="Count" 
+                   class="input-field count-input"
+                   min="1"
+                   max="10000">
+            <button type="button" 
+                    class="btn-remove" 
+                    (click)="removeCategory(i)"
+                    [disabled]="eventForm.categories.length === 1"
+                    title="Remove Category">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <button type="button" class="btn-add-category" (click)="addCategory()">
+          <i class="fas fa-plus-circle"></i> Add Category
+        </button>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" (click)="closeCreateEventModal()">
+          Cancel
+        </button>
+        <button type="submit" 
+                class="btn-primary"
+                [disabled]="!createEventForm.form.valid || !eventForm.name.trim()">
+          Create Event
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
