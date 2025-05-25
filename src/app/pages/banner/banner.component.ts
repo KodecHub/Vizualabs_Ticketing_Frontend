@@ -14,7 +14,7 @@ export class BannerComponent {
   event = {
     title: 'Wenas Nights',
     subtitle: 'BNS, Raini, Sarith Surith with News',
-    date: '2025 / 10 /06',
+    date: '2025/10/06',
     venue: 'Saffron Beach hotel, Wadduwa',
     ticketPrices: [
       { type: 'SILVER', price: 3500 },

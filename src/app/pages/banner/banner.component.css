@@ -1,191 +1,207 @@
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+    }
 
-.simple-banner {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 60px; /* Increased to account for the overlap */
-}
+    .simple-banner {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 40px;
+    }
 
-.banner-img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: block;
-}
+    .banner-img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+      display: block;
+    }
 
-.event-info-box {
-  padding: 2rem;
-  /* background: linear-gradient(135deg, rgba(10, 46, 54, 0.9) 0%, rgba(15, 58, 66, 0.9) 100%); */
-  backdrop-filter: blur(10px);
-  margin-top: -60px;
-  position: relative;
-  z-index: 2;
-  border-radius: 12px 12px 0 0;
-  color: rgb(0, 0, 0);
-}
+    .event-info-box {
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      margin-top: -20px;
+      position: relative;
+      z-index: 2;
+      border-radius: 10px 10px 0 0;
+      color: rgb(0, 0, 0);
+    }
 
-/* Event header styling */
-h1,
-h2 {
-  margin-bottom: 20px;
-  border-left: 4px solid #00e5ff;
-  padding-left: 1rem;
-}
+    h1, h2 {
+      margin-bottom: 15px;
+      border-left: 3px solid #00e5ff;
+      padding-left: 0.8rem;
+    }
 
-h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0;
-  display: inline-block;
-  background: linear-gradient(90deg, #00e5ff, #b400ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+      display: inline-block;
+      background: linear-gradient(90deg, #00e5ff, #b400ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
 
-h2 {
-  font-size: 1.5rem;
-  font-weight: 400;
-  margin: 0;
-  display: inline-block;
-  color: rgb(0, 0, 0);
-}
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 400;
+      margin: 0;
+      display: inline-block;
+      color: rgb(0, 0, 0);
+    }
 
-/* Event info layout */
-.details {
-  flex: 1;
-  min-width: 250px;
-  margin-top: 20px;
-}
+    .details {
+      flex: 1;
+      min-width: 200px;
+      margin-top: 15px;
+    }
 
-.details p {
-  font-size: 1.1rem;
-  margin: 0;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-}
+    .details p {
+      font-size: 1rem;
+      margin: 0;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
 
-.details p::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #00e5ff;
-  margin-right: 10px;
-  border-radius: 50%;
-}
+    .details p::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #00e5ff;
+      margin-right: 8px;
+      border-radius: 50%;
+    }
 
-.details i {
-  margin-right: 10px;
-  color: #00e5ff;
-}
+    .details i {
+      margin-right: 8px;
+      color: #00e5ff;
+    }
 
-/* Ticket prices styling */
-.prices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-}
+    .prices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
 
-.ticket {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  font-size: 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-}
+    .ticket {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.4rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
 
-.ticket:hover {
-  background: rgba(0, 229, 255, 0.2);
-  border-color: #00e5ff;
-  transform: translateY(-2px);
-}
+    .ticket:hover {
+      background: rgba(0, 229, 255, 0.2);
+      border-color: #00e5ff;
+      transform: translateY(-2px);
+    }
 
-.separator {
-  display: none; 
-}
+    .separator {
+      display: none;
+    }
 
-/* Booking button styling */
-button {
-  background: #0078ff;
-  color: white;
-  border: none;
-  padding: 1rem 2.5rem;
-  font-size: 1.2rem;
-  font-weight: 600;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(0, 120, 255, 0.4);
-  display: block;
-  margin: 0 auto;
-}
+    /* Updated Book Now button styling */
+    button {
+      position: absolute;
+      top: 80px;
+      right: 15px;
+      background-color: #0078ff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+      z-index: 3;
+    }
 
-button:hover {
-  background: #0066e0;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 120, 255, 0.6);
-}
+    button:hover {
+      background-color: #0066e0;
+    }
 
-button:active {
-  transform: translateY(-1px);
-}
+    @media (max-width: 600px) {
+      .event-info-box {
+        padding: 1.2rem;
+      }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .event-info-box {
-    padding: 1.5rem;
-  }
+      h1 {
+        font-size: 1.8rem;
+      }
 
-  h1 {
-    font-size: 2rem;
-  }
+      h1, h2 {
+        display: block;
+      }
 
-  h1,
-  h2 {
-    display: block;
-  }
+      h2 {
+        margin-left: 0;
+        margin-top: 5px;
+        font-size: 1.1rem;
+      }
 
-  h2 {
-    margin-left: 0;
-    margin-top: 5px;
-  }
+      button {
+        top: 12px;
+        right: 12px;
+        padding: 8px 16px;
+        font-size: 1rem;
+      }
+    }
 
-  button {
-    width: 100%;
-    padding: 0.8rem 1.8rem;
-  }
-}
+    @media (max-width: 480px) {
+      .container {
+        padding: 12px;
+      }
 
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.5rem;
-  }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.4rem;
+      }
 
-  h2 {
-    font-size: 1rem;
-  }
+      h2 {
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+      }
 
-  button {
-    padding: 0.8rem 1.8rem;
-    font-size: 1rem;
-  }
+      .event-info-box {
+        padding: 1.2rem;
+        margin-top: -30px;
+      }
 
-  .prices {
-    flex-direction: column;
-    gap: 10px;
-  }
-}
+      .details p {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+      }
+
+      .prices {
+        flex-direction: column;
+        gap: 10px;
+        margin: 1.2rem 0;
+      }
+
+      .ticket {
+        width: 100%;
+        text-align: center;
+        padding: 0.6rem;
+      }
+
+      button{
+        padding: 6px 14px;
+        font-size: 1rem;
+        margin-top: 1.2rem;
+      }
+    }
