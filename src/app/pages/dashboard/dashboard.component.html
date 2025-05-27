@@ -6,12 +6,12 @@
       <h1>Welcome, Admin</h1>
     </div>
     <button class="btn-primary" (click)="openCreateEventModal()" type="button">
-      <i class="fas fa-plus"></i> Create event
+      <span class="icon">+</span> Create event
     </button>
   </div>
 </header>
 
-<!-- Navigation -->
+<!-- Navigation with PNG Icons -->
 <nav class="navigation">
   <div class="nav-item" 
        [class.active]="activeTab === 'dashboard'" 
@@ -20,7 +20,8 @@
        tabindex="0"
        (keydown.enter)="setActiveTab('dashboard')"
        (keydown.space)="setActiveTab('dashboard')">
-    <i class="fas fa-chart-pie"></i> Dashboard
+    <img [src]="icons.dashboard" alt="Dashboard" class="nav-icon-img">
+    Dashboard
   </div>
   <div class="nav-item" 
        [class.active]="activeTab === 'tickets'" 
@@ -29,7 +30,8 @@
        tabindex="0"
        (keydown.enter)="setActiveTab('tickets')"
        (keydown.space)="setActiveTab('tickets')">
-    <i class="fas fa-ticket-alt"></i> Tickets
+    <img [src]="icons.tickets" alt="Tickets" class="nav-icon-img">
+    Tickets
   </div>
   <div class="nav-item" 
        [class.active]="activeTab === 'validation'" 
@@ -38,7 +40,8 @@
        tabindex="0"
        (keydown.enter)="setActiveTab('validation')"
        (keydown.space)="setActiveTab('validation')">
-    <i class="fas fa-check-circle"></i> Validation
+    <img [src]="icons.validation" alt="Validation" class="nav-icon-img">
+    Validation
   </div>
 </nav>
 
@@ -51,50 +54,47 @@
       <div class="event-header">
         <div class="event-info">
           <h2>{{ currentEvent.name }}</h2>
-          <p><strong>ID:</strong> {{ currentEvent.id }}</p>
-          <p><strong>Count:</strong> {{ currentEvent.totalCount }}</p>
-          <p class="limits"><strong>Limits:</strong> {{ currentEvent.limits }}</p>
+          <p>ID:{{ currentEvent.id }}</p>
+          <p>Count {{ currentEvent.totalCount }}</p>
+          <p class="limits">Limits: {{ currentEvent.limits }}</p>
         </div>
         <div class="event-actions">
-          <button class="btn-icon" 
+          <button class="action-btn delete-btn" 
                   (click)="deleteEvent()" 
                   type="button"
                   title="Delete Event"
                   aria-label="Delete Event">
-            <i class="fas fa-trash"></i>
+            <img [src]="icons.delete" alt="Delete" class="action-icon-img">
           </button>
-          <button class="btn-icon" 
+          <button class="action-btn edit-btn" 
                   (click)="editEvent()" 
                   type="button"
                   title="Edit Event"
                   aria-label="Edit Event">
-            <i class="fas fa-edit"></i>
+            <img [src]="icons.edit" alt="Edit" class="action-icon-img">
           </button>
         </div>
       </div>
     </div>
 
-    <!-- No Event Message -->
-    <div *ngIf="currentEvent.name === 'No Event Selected'" class="no-event-card">
-      <h2>No Event Selected</h2>
-      <p>Create a new event to get started</p>
-      <button class="btn-primary" (click)="openCreateEventModal()" type="button">
-        <i class="fas fa-plus"></i> Create Your First Event
-      </button>
-    </div>
-
-    <!-- Stats Cards -->
+    <!-- Stats Cards with Icons -->
     <div class="stats-grid" *ngIf="currentEvent.name !== 'No Event Selected'">
       <div class="stat-card">
-        <h3>Total sales Revenue</h3>
+        <div class="stat-header">
+          <h3>Total sales Revenue</h3>
+        </div>
         <p class="stat-value">{{ dashboardStats.totalRevenue }}</p>
       </div>
       <div class="stat-card">
-        <h3>Ticket sales</h3>
+        <div class="stat-header">
+          <h3>Ticket sales</h3>
+        </div>
         <p class="stat-value">{{ dashboardStats.ticketSales }}</p>
       </div>
       <div class="stat-card">
-        <h3>Available tickets</h3>
+        <div class="stat-header">
+          <h3>Available tickets</h3>
+        </div>
         <p class="stat-value">{{ dashboardStats.availableTickets }}</p>
       </div>
     </div>
@@ -105,11 +105,15 @@
     <!-- Ticket Stats -->
     <div class="ticket-stats">
       <div class="stat-card">
-        <h3>Ticket sales</h3>
+        <div class="stat-header">
+          <h3>Ticket sales</h3>
+        </div>
         <span class="stat-number">{{ ticketStats.sales }}</span>
       </div>
       <div class="stat-card">
-        <h3>Available tickets</h3>
+        <div class="stat-header">
+          <h3>Available tickets</h3>
+        </div>
         <span class="stat-number">{{ ticketStats.available }}</span>
       </div>
       <button class="btn-primary generate-btn" 
@@ -120,19 +124,6 @@
       </button>
     </div>
 
-    <!-- Ticket Actions -->
-    <div class="ticket-actions" *ngIf="tickets.length > 0">
-      <button class="btn-outline" (click)="selectAllTickets()" type="button">
-        {{ getSelectedTicketsCount() === tickets.length ? 'Deselect All' : 'Select All' }}
-      </button>
-      <button class="btn-danger" 
-              (click)="deleteSelectedTickets()" 
-              type="button"
-              [disabled]="getSelectedTicketsCount() === 0">
-        Delete Selected ({{ getSelectedTicketsCount() }})
-      </button>
-    </div>
-
     <!-- Tickets Table -->
     <div class="table-container" *ngIf="tickets.length > 0; else noTickets">
       <table class="data-table" role="table">
@@ -140,7 +131,7 @@
           <tr>
             <th scope="col">Ticket Id</th>
             <th scope="col">Event</th>
-            <th scope="col">Name</th>
+            <th scope="col">name</th>
             <th scope="col">Category</th>
             <th scope="col">Status</th>
             <th scope="col">Action</th>
@@ -152,11 +143,7 @@
             <td>{{ ticket.event }}</td>
             <td>{{ ticket.name }}</td>
             <td>{{ ticket.category }}</td>
-            <td>
-              <span class="status-badge" [class]="'status-' + ticket.status.toLowerCase()">
-                {{ ticket.status }}
-              </span>
-            </td>
+            <td>{{ ticket.status }}</td>
             <td>
               <input type="checkbox" 
                      [(ngModel)]="ticket.selected"
@@ -169,7 +156,7 @@
 
     <ng-template #noTickets>
       <div class="no-data">
-        <i class="fas fa-ticket-alt"></i>
+        <img [src]="icons.tickets" alt="No Tickets" class="large-icon-img" *ngIf="icons.tickets">
         <h3>No Tickets Found</h3>
         <p>Generate tickets to see them here</p>
       </div>
@@ -181,15 +168,21 @@
     <!-- Validation Stats -->
     <div class="validation-stats">
       <div class="stat-card">
-        <h3>Active Tickets</h3>
+        <div class="stat-header">
+          <h3>Active Tickets</h3>
+        </div>
         <span class="stat-number">{{ validationStats.activeTickets }}</span>
       </div>
       <div class="stat-card">
-        <h3>Participants</h3>
+        <div class="stat-header">
+          <h3>Participants</h3>
+        </div>
         <span class="stat-number">{{ validationStats.participants }}</span>
       </div>
       <div class="validation-controls">
-        <button class="btn-outline" type="button">All</button>
+        <button class="btn-outline" type="button">
+          All
+        </button>
         <button class="btn-primary" 
                 (click)="validateTicket()" 
                 type="button"
@@ -201,13 +194,15 @@
 
     <!-- Ticket ID Input -->
     <div class="ticket-id-input">
-      <label for="ticketIdInput" class="sr-only">Enter Ticket ID to validate</label>
-      <input type="text" 
-             id="ticketIdInput"
-             placeholder="Ticket Id" 
-             [(ngModel)]="ticketIdToValidate" 
-             class="input-field"
-             (keydown.enter)="validateTicket()">
+      <div class="input-with-icon"> 
+        <input type="text" 
+               id="ticketIdInput"
+               placeholder="Ticket Id" 
+               [(ngModel)]="ticketIdToValidate" 
+               class="input-field"
+               [class.with-icon]="icons.search"
+               (keydown.enter)="validateTicket()">
+      </div>
     </div>
 
     <!-- Validation Table -->
@@ -217,7 +212,7 @@
           <tr>
             <th scope="col">Ticket Id</th>
             <th scope="col">Event</th>
-            <th scope="col">Name</th>
+            <th scope="col">name</th>
             <th scope="col">Category</th>
             <th scope="col">Status</th>
             <th scope="col">Action</th>
@@ -229,11 +224,7 @@
             <td>{{ ticket.event }}</td>
             <td>{{ ticket.name }}</td>
             <td>{{ ticket.category }}</td>
-            <td>
-              <span class="status-badge" [class]="'status-' + ticket.status.toLowerCase()">
-                {{ ticket.status }}
-              </span>
-            </td>
+            <td>{{ ticket.status }}</td>
             <td>
               <input type="checkbox" 
                      [(ngModel)]="ticket.selected"
@@ -246,7 +237,7 @@
 
     <ng-template #noValidationTickets>
       <div class="no-data">
-        <i class="fas fa-check-circle"></i>
+        <img [src]="icons.validation" alt="No Validation" class="large-icon-img" *ngIf="icons.validation">
         <h3>No Tickets to Validate</h3>
         <p>Generate tickets first to validate them</p>
       </div>
@@ -262,10 +253,12 @@
      aria-modal="true"
      aria-labelledby="generate-modal-title">
   <div class="modal" (click)="$event.stopPropagation()">
-    <h2 id="generate-modal-title">Generate Tickets</h2>
+    <div class="modal-header">
+      <img [src]="icons.tickets" alt="Generate" class="modal-icon-img" *ngIf="icons.tickets">
+      <h2 id="generate-modal-title">Generate Tickets</h2>
+    </div>
     <form (ngSubmit)="generateTickets()" #generateTicketForm="ngForm">
       <div class="form-group">
-        <label for="categorySelect">Category</label>
         <select [(ngModel)]="generateForm.category" 
                 name="category"
                 id="categorySelect"
@@ -278,7 +271,6 @@
         </select>
       </div>
       <div class="form-group">
-        <label for="countInput">Count</label>
         <input type="number" 
                [(ngModel)]="generateForm.count" 
                name="count"
@@ -290,11 +282,8 @@
                required>
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-outline" (click)="closeGenerateModal()">
-          Cancel
-        </button>
         <button type="submit" 
-                class="btn-primary"
+                class="btn-primary btn-full"
                 [disabled]="!generateTicketForm.form.valid">
           Generate Ticket
         </button>
@@ -311,7 +300,10 @@
      aria-modal="true"
      aria-labelledby="create-event-modal-title">
   <div class="modal create-event-modal" (click)="$event.stopPropagation()">
-    <h2 id="create-event-modal-title">Create New Event</h2>
+    <div class="modal-header">
+      <img [src]="icons.add" alt="Create" class="modal-icon-img" *ngIf="icons.add">
+      <h2 id="create-event-modal-title">Create New Event</h2>
+    </div>
     <form (ngSubmit)="createEvent()" #createEventForm="ngForm">
       <div class="form-group">
         <label for="eventNameInput">Event Name</label>
@@ -326,22 +318,30 @@
       </div>
       
       <div class="tickets-section">
-        <h3>Tickets</h3>
+        <h3>
+          <img [src]="icons.tickets" alt="Tickets" class="section-icon-img" *ngIf="icons.tickets">
+          Tickets
+        </h3>
         <div class="ticket-category" *ngFor="let category of eventForm.categories; let i = index">
           <div class="category-row">
-            <input type="text" 
-                   [(ngModel)]="category.name" 
-                   [name]="'categoryName' + i"
-                   placeholder="Category" 
-                   class="input-field"
-                   maxlength="50">
-            <input type="number" 
-                   [(ngModel)]="category.price" 
-                   [name]="'categoryPrice' + i"
-                   placeholder="Price" 
-                   class="input-field"
-                   min="0"
-                   step="0.01">
+            <select [(ngModel)]="category.name" 
+                    [name]="'categoryName' + i"
+                    class="input-field"
+                    required>
+              <option value="">Select Category</option>
+              <option value="VVIP">VVIP</option>
+              <option value="VIP">VIP</option>
+              <option value="General">General</option>
+            </select>
+            <select [(ngModel)]="category.price" 
+                    [name]="'categoryPrice' + i"
+                    class="input-field"
+                    required>
+              <option value="">Select Price</option>
+              <option [value]="7500">LKR 7,500</option>
+              <option [value]="5000">LKR 5,000</option>
+              <option [value]="3500">LKR 3,500</option>
+            </select>
             <input type="number" 
                    [(ngModel)]="category.count" 
                    [name]="'categoryCount' + i"
@@ -352,24 +352,32 @@
             <button type="button" 
                     class="btn-remove" 
                     (click)="removeCategory(i)"
-                    [disabled]="eventForm.categories.length === 1"
+                    *ngIf="eventForm.categories.length > 1"
                     title="Remove Category">
-              <i class="fas fa-times"></i>
+              <img [src]="icons.delete" alt="Remove" class="remove-icon-img" *ngIf="icons.delete">
+              <span *ngIf="!icons.delete">×</span>
             </button>
           </div>
         </div>
         <button type="button" class="btn-add-category" (click)="addCategory()">
-          <i class="fas fa-plus-circle"></i> Add Category
+          <img [src]="icons.add" alt="Add" class="add-icon-img" *ngIf="icons.add">
+          <span *ngIf="!icons.add">+</span>
+          Add Category
         </button>
       </div>
-      
+
+      <!-- Submit Buttons -->
       <div class="modal-actions">
-        <button type="button" class="btn-outline" (click)="closeCreateEventModal()">
+        <button type="button" 
+                class="btn-outline" 
+                (click)="closeCreateEventModal()">
           Cancel
         </button>
         <button type="submit" 
                 class="btn-primary"
-                [disabled]="!createEventForm.form.valid || !eventForm.name.trim()">
+                [disabled]="!createEventForm.form.valid || !isEventFormValid()">
+          <img [src]="icons.add" alt="Create" class="btn-icon" *ngIf="icons.add">
+          <span *ngIf="!icons.add">+</span>
           Create Event
         </button>
       </div>

@@ -63,11 +63,47 @@ export class DashboardComponent {
   showCreateEventModal = false
   ticketIdToValidate = ""
 
+  // PNG Icons paths - ඔබේ PNG files මේ paths වලට දාන්න
+  icons = {
+    // Navigation icons
+    dashboard: "dashboard.png",
+    tickets: "tickets.png",
+    validation: "validation.png",
+
+    // Action icons
+    edit: "edit.png",
+    delete: "delete.png",
+    add: "add.png",
+
+    // Stats icons
+    revenue: "revenue.png",
+    sales: "sales.png",
+    available: "available.png",
+
+    // Other icons
+    user: "user.png",
+    search: "search.png",
+    check: "check.png",
+  }
+
+  // Predefined options for dropdowns
+  categoryOptions = [
+    { value: "VVIP", label: "VVIP" },
+    { value: "VIP", label: "VIP" },
+    { value: "General", label: "General" },
+  ]
+
+  priceOptions = [
+    { value: 7500, label: "LKR 7,500" },
+    { value: 5000, label: "LKR 5,000" },
+    { value: 3500, label: "LKR 3,500" },
+  ]
+
   currentEvent: Event = {
     name: "Wenas Nights",
     id: "EV001",
     totalCount: 600,
-    limits: "VVIP (100), VIP (300), General (200)",
+    limits: "VVIP (100),VIP(300),General(200)",
   }
 
   dashboardStats: DashboardStats = {
@@ -152,7 +188,6 @@ export class DashboardComponent {
   constructor() {}
 
   ngOnInit(): void {
-    // Initialize component
     this.updateValidationTickets()
   }
 
@@ -212,7 +247,7 @@ export class DashboardComponent {
       this.eventForm.categories.forEach((category) => {
         if (category.name && category.count && category.count > 0) {
           totalCount += category.count
-          limits.push(`${category.name} (${category.count})`)
+          limits.push(`${category.name}(${category.count})`)
         }
       })
 
@@ -221,7 +256,7 @@ export class DashboardComponent {
           name: this.eventForm.name,
           id: this.generateEventId(),
           totalCount: totalCount,
-          limits: limits.join(", "),
+          limits: limits.join(","),
         }
 
         this.resetStatsForNewEvent(totalCount)
@@ -231,6 +266,24 @@ export class DashboardComponent {
         this.showSuccessMessage(`Successfully created event: ${this.eventForm.name}!`)
       }
     }
+  }
+
+  // Form validation method
+  isEventFormValid(): boolean {
+    if (!this.eventForm.name.trim()) {
+      return false
+    }
+
+    // At least one category should have valid data
+    return this.eventForm.categories.some(
+      (category) =>
+        category.name &&
+        category.name.trim() &&
+        category.price !== null &&
+        category.price >= 0 &&
+        category.count !== null &&
+        category.count > 0,
+    )
   }
 
   addCategory(): void {
@@ -366,18 +419,18 @@ export class DashboardComponent {
   }
 
   private showSuccessMessage(message: string): void {
-    alert(message) // Replace with proper notification service
+    alert(message)
   }
 
   private showErrorMessage(message: string): void {
-    alert(message) // Replace with proper notification service
+    alert(message)
   }
 
   private showInfoMessage(message: string): void {
-    alert(message) // Replace with proper notification service
+    alert(message)
   }
 
   private confirmAction(message: string): boolean {
-    return confirm(message) // Replace with proper confirmation dialog
+    return confirm(message)
   }
 }
