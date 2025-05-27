@@ -1,0 +1,23 @@
+<div class="container">
+  <div class="simple-banner">
+    <img [src]="event.bannerImage" alt="Wenas Nights" class="banner-img">
+  </div>
+
+  <div class="event-info-box">
+    <h1>{{event.title}}</h1>
+    <h2>{{event.subtitle}}</h2>
+    
+    <div class="details">
+      <p><i class="fa fa-calendar"></i> {{event.date}}</p>
+      <p><i class="fa fa-map-marker"></i> {{event.venue}}</p>
+    </div>
+    
+    <div class="prices">
+      <div *ngFor="let ticket of event.ticketPrices; let last = last" class="ticket">
+        LKR {{ticket.price}}<span *ngIf="!last" class="separator">|</span>
+      </div>
+    </div>
+    
+    <button (click)="navigateToBooking()">Book Now</button>
+  </div>
+</div>
