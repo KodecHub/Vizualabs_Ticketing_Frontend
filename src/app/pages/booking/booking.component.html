@@ -2,7 +2,6 @@
   <div class="event-header">
     <h1 class="event-title">Wenas Nights</h1>
     <p class="event-subtitle">BNS, Raini, Sarith Surith with News</p>
-    
     <div class="event-details">
       <p class="event-date">2025/10/06</p>
       <p class="event-location">Saffron Beach hotel, Wadduwa</p>
@@ -10,78 +9,90 @@
   </div>
 
   <div class="booking-container">
-    <div class="booking-form">
+    <form class="booking-form" [formGroup]="bookingForm" (ngSubmit)="bookNow()">
       <div class="form-group">
         <label for="name">Name</label>
-        <input type="text" id="name" [(ngModel)]="bookingForm.name">
+        <input type="text" id="name" formControlName="name" placeholder="Enter your full name" />
+        <div class="error" *ngIf="bookingForm.get('name')?.touched && bookingForm.get('name')?.invalid">
+          Name is required.
+        </div>
       </div>
-      
+
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" id="email" [(ngModel)]="bookingForm.email">
+        <input type="email" id="email" formControlName="email" placeholder="Enter a valid email address" />
+        <div class="error" *ngIf="bookingForm.get('email')?.touched && bookingForm.get('email')?.invalid">
+          Valid email is required.
+        </div>
       </div>
-      
+
       <div class="form-group">
-        <label for="phone">Phone No.</label>
-        <input type="tel" id="phone" [(ngModel)]="bookingForm.phone">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" formControlName="phone" placeholder="Enter your phone number" />
+        <div class="error" *ngIf="bookingForm.get('phone')?.touched && bookingForm.get('phone')?.invalid">
+          Phone number is required.
+        </div>
       </div>
-      
+
       <div class="form-group">
-        <label for="nic">NIC No.</label>
-        <input type="text" id="nic" [(ngModel)]="bookingForm.nic">
+        <label for="nic">NIC</label>
+        <input type="text" id="nic" formControlName="nic" placeholder="Enter your NIC number" />
+        <div class="error" *ngIf="bookingForm.get('nic')?.touched && bookingForm.get('nic')?.invalid">
+          NIC is required.
+        </div>
       </div>
-      
+
       <div class="form-group ticket-selector">
         <div class="dropdown">
-          <button class="dropdown-toggle" (click)="toggleDropdown()">
+          <button type="button" class="dropdown-toggle" (click)="toggleDropdown()">
             {{ selectedTicket || 'Select Ticket' }}
             <span class="caret">▼</span>
           </button>
           <div class="dropdown-content" [class.show]="showDropdown">
-            <div class="dropdown-item" (click)="selectTicket('SILVER')">SILVER</div>
-            <div class="dropdown-item" (click)="selectTicket('GOLD')">GOLD</div>
-            <div class="dropdown-item" (click)="selectTicket('PLATINUM')">PLATINUM</div>
+            <div class="dropdown-item" (click)="selectTicket('GENERAL')">GENERAL</div>
+            <div class="dropdown-item" (click)="selectTicket('VIP')">VIP</div>
+            <div class="dropdown-item" (click)="selectTicket('VVIP')">VVIP</div>
           </div>
         </div>
-        
+
         <div class="quantity-selector">
-          <button class="quantity-btn" (click)="decreaseQuantity()">−</button>
-          <input type="text" class="quantity-input" [value]="quantity" readonly>
-          <button class="quantity-btn" (click)="increaseQuantity()">+</button>
+          <button type="button" class="quantity-btn" (click)="decreaseQuantity()">−</button>
+          <input type="text" class="quantity-input" [value]="quantity" readonly />
+          <button type="button" class="quantity-btn" (click)="increaseQuantity()">+</button>
         </div>
       </div>
-    </div>
-    
+    </form>
+
     <div class="booking-summary">
       <h2>Booking Summary</h2>
-      
+
       <div class="summary-items">
         <div class="summary-item">
           <span class="item-name">{{ selectedTicket }}</span>
-          <span class="item-price">{{ ticketPrice }}.00LKR</span>
+          <span class="item-price">{{ ticketPrice }}.00 LKR</span>
         </div>
-        
+
         <div class="summary-item">
           <span class="item-name">Qty</span>
           <span class="item-qty">x{{ quantity }}</span>
         </div>
-        
+
         <div class="summary-item">
           <span class="item-name">Convenience Fee</span>
           <span class="item-fee">+ {{ convenienceFee }}.00 LKR</span>
         </div>
       </div>
-      
+
       <div class="summary-divider"></div>
-      
+
       <div class="summary-total">
         <span class="total-label">Total</span>
         <span class="total-amount">+ {{ calculateTotal() }}.00 LKR</span>
       </div>
-      
+
       <div class="summary-divider"></div>
     </div>
   </div>
-  
+
   <button class="book-now-btn" (click)="bookNow()">Book Now</button>
 </div>
