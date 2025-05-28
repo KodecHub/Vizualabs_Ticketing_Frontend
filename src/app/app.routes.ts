@@ -7,7 +7,14 @@ export const routes: Routes = [
         component: BannerComponent
     },
     {
-        path: 'booking',
+        path: 'admin',
         loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent) 
-    }
+    },
+    {   path: 'booking',   
+        loadComponent: () => import('./pages/booking/booking.component').then(m => m.BookingComponent) 
+    },
+    {
+        path: '',
+        redirectTo: '/booking', pathMatch: 'full'
+    },
 ];

@@ -21,7 +21,7 @@ export class BannerComponent {
       { type: 'GOLD', price: 5000 },
       { type: 'PLATINUM', price: 7500 }
     ],
-    bannerImage:"banner.jpeg",
+    bannerImage:"banner.png",
   };
 
   constructor(private router: Router) {}

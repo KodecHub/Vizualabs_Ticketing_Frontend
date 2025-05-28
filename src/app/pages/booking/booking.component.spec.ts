@@ -46,13 +46,13 @@ describe('BookingComponent', () => {
   });
 
   it('should update ticket price when selecting different ticket', () => {
-    component.selectTicket('GOLD');
+    component.selectTicket('VIP');
     expect(component.ticketPrice).toBe(5000);
     
-    component.selectTicket('PLATINUM');
+    component.selectTicket('VVIP');
     expect(component.ticketPrice).toBe(7500);
     
-    component.selectTicket('SILVER');
+    component.selectTicket('GENERAL');
     expect(component.ticketPrice).toBe(3500);
   });
 });
