@@ -1,11 +1,18 @@
-<nav class="navigation">
-  <ul>
-    <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
-    
-    <li><a routerLink="/booking" routerLinkActive="active">Book Tickets</a></li>
-
-    <li><a routerLink="/admin" routerLinkActive="active">Admin</a></li>
-  </ul>
-</nav>
-
-<router-outlet></router-outlet>
+<div class="app-container">
+  <!-- Navigation -->
+  <nav class="navigation">
+    <ul>
+      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+      <li><a routerLink="/booking" routerLinkActive="active">Book Tickets</a></li>
+      <li><a routerLink="/admin" routerLinkActive="active">Admin</a></li>
+    </ul>
+  </nav>
+  
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+  
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>
