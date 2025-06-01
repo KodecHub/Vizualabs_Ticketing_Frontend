@@ -63,7 +63,6 @@ export class DashboardComponent {
   showCreateEventModal = false
   ticketIdToValidate = ""
 
-  // PNG Icons paths - ඔබේ PNG files මේ paths වලට දාන්න
   icons = {
     // Navigation icons
     dashboard: "dashboard.png",
