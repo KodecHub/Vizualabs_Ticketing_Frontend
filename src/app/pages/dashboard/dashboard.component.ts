@@ -202,7 +202,7 @@ export class DashboardComponent {
       };
 
       this.eventService
-        .registerEvent(this.eventForm.name, this.generateEventId(), result)
+        .registerEvent(this.eventForm.name, 'EV001', result)
         .subscribe({
           next: (data: any) => {
             this.registertedEventData = data;
@@ -402,9 +402,9 @@ export class DashboardComponent {
     this.validationStats.participants = this.tickets.length;
   }
 
-  private generateEventId(): string {
-    return `EV${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-  }
+  // private generateEventId(): string {
+  //   return `EV${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+  // }
 
   private showSuccessMessage(message: string): void {
     alert(message);
