@@ -67,10 +67,10 @@ export class DashboardComponent {
   constructor(private eventService: EventService) {}
 
   ngOnInit(): void {
+    this.loadFromLocalStorage();
     this.updateValidationTickets();
   }
 
-  // PNG Icons paths
   icons = {
     dashboard: 'dashboard.png',
     tickets: 'tickets.png',
@@ -180,6 +180,7 @@ export class DashboardComponent {
       this.tickets = [...this.tickets, ...newTickets];
       this.updateStats(this.generateForm.count);
       this.updateValidationTickets();
+      this.saveToLocalStorage();
       this.closeGenerateModal();
 
       this.showSuccessMessage(
@@ -201,11 +202,10 @@ export class DashboardComponent {
       };
 
       this.eventService
-        .registerEvent(this.eventForm.name, 'EV001', result)
+        .registerEvent(this.eventForm.name, this.generateEventId(), result)
         .subscribe({
           next: (data: any) => {
             this.registertedEventData = data;
-            console.log(this.registertedEventData);
 
             let totalCount = 0;
             const limits: string[] = [];
@@ -227,6 +227,7 @@ export class DashboardComponent {
 
               this.resetStatsForNewEvent(totalCount);
               this.clearTickets();
+              this.saveToLocalStorage();
               this.closeCreateEventModal();
             }
 
@@ -241,13 +242,11 @@ export class DashboardComponent {
     }
   }
 
-  // Form validation method
   isEventFormValid(): boolean {
     if (!this.eventForm.name.trim()) {
       return false;
     }
 
-    // At least one category should have valid data
     return this.eventForm.categories.some(
       (category) =>
         category.name &&
@@ -283,6 +282,7 @@ export class DashboardComponent {
       };
       this.resetStatsForNewEvent(0);
       this.clearTickets();
+      this.saveToLocalStorage();
       this.showSuccessMessage('Event deleted successfully!');
     }
   }
@@ -335,6 +335,7 @@ export class DashboardComponent {
     ) {
       this.tickets = this.tickets.filter((ticket) => !ticket.selected);
       this.updateValidationTickets();
+      this.saveToLocalStorage();
       this.showSuccessMessage(`${selectedCount} tickets deleted successfully!`);
     }
   }
@@ -343,7 +344,8 @@ export class DashboardComponent {
     return ticket.id + ticket.name + ticket.category;
   }
 
-  // Private helper methods
+  // === Private Methods ===
+
   private resetGenerateForm(): void {
     this.generateForm = {
       category: '',
@@ -418,5 +420,24 @@ export class DashboardComponent {
 
   private confirmAction(message: string): boolean {
     return confirm(message);
+  }
+
+  private saveToLocalStorage(): void {
+    localStorage.setItem('currentEvent', JSON.stringify(this.currentEvent));
+    localStorage.setItem('tickets', JSON.stringify(this.tickets));
+    localStorage.setItem('dashboardStats', JSON.stringify(this.dashboardStats));
+    localStorage.setItem('ticketStats', JSON.stringify(this.ticketStats));
+  }
+
+  private loadFromLocalStorage(): void {
+    const event = localStorage.getItem('currentEvent');
+    const tickets = localStorage.getItem('tickets');
+    const dashboard = localStorage.getItem('dashboardStats');
+    const stats = localStorage.getItem('ticketStats');
+
+    if (event) this.currentEvent = JSON.parse(event);
+    if (tickets) this.tickets = JSON.parse(tickets);
+    if (dashboard) this.dashboardStats = JSON.parse(dashboard);
+    if (stats) this.ticketStats = JSON.parse(stats);
   }
 }
