@@ -56,6 +56,12 @@
       </div>
     </div>
 
+    <!-- Show message when no event is selected -->
+    <div *ngIf="currentEvent.name === 'No Event Selected'" class="no-data">
+      <h3>No Event Selected</h3>
+      <p>Create an event to get started</p>
+    </div>
+
     <!-- Stats Cards with Icons -->
     <div class="stats-grid" *ngIf="currentEvent.name !== 'No Event Selected'">
       <div class="stat-card">

@@ -70,30 +70,22 @@ export class DashboardComponent {
     this.updateValidationTickets();
   }
 
-  // PNG Icons paths - ඔබේ PNG files මේ paths වලට දාන්න
+  // PNG Icons paths
   icons = {
-    // Navigation icons
     dashboard: 'dashboard.png',
     tickets: 'tickets.png',
     validation: 'validation.png',
-
-    // Action icons
     edit: 'edit.png',
     delete: 'delete.png',
     add: 'add.png',
-
-    // Stats icons
     revenue: 'revenue.png',
     sales: 'sales.png',
     available: 'available.png',
-
-    // Other icons
     user: 'user.png',
     search: 'search.png',
     check: 'check.png',
   };
 
-  // Predefined options for dropdowns
   categoryOptions = [
     { value: 'VVIP', label: 'VVIP' },
     { value: 'VIP', label: 'VIP' },
@@ -107,80 +99,30 @@ export class DashboardComponent {
   ];
 
   currentEvent: Event = {
-    name: '',
-    id: 'EV001',
+    name: 'No Event Selected',
+    id: '',
     totalCount: 0,
     limits: '',
   };
 
   dashboardStats: DashboardStats = {
-    totalRevenue: 'LKR 152,000',
-    ticketSales: 121,
-    availableTickets: 322,
+    totalRevenue: 'LKR 0',
+    ticketSales: 0,
+    availableTickets: 0,
   };
 
   ticketStats: TicketStats = {
-    sales: 121,
-    available: 100,
+    sales: 0,
+    available: 0,
   };
 
   validationStats: ValidationStats = {
-    activeTickets: 121,
-    participants: 521,
+    activeTickets: 0,
+    participants: 0,
   };
 
-  tickets: Ticket[] = [
-    {
-      id: 'EV001',
-      event: 'Wenas Events',
-      name: 'Pulindu Marasinghe',
-      category: 'General',
-      status: 'Active',
-      selected: false,
-    },
-    {
-      id: 'EV001',
-      event: 'Wenas Events',
-      name: 'Pulindu Marasinghe',
-      category: 'General',
-      status: 'Active',
-      selected: false,
-    },
-    {
-      id: 'EV001',
-      event: 'Wenas Events',
-      name: 'Pulindu Marasinghe',
-      category: 'General',
-      status: 'Active',
-      selected: false,
-    },
-    {
-      id: 'EV001',
-      event: 'Wenas Events',
-      name: 'Pulindu Marasinghe',
-      category: 'General',
-      status: 'Active',
-      selected: false,
-    },
-    {
-      id: 'EV001',
-      event: 'Wenas Events',
-      name: 'Pulindu Marasinghe',
-      category: 'General',
-      status: 'Active',
-      selected: false,
-    },
-    {
-      id: 'EV001',
-      event: 'Wenas Events',
-      name: 'Pulindu Marasinghe',
-      category: 'General',
-      status: 'Active',
-      selected: false,
-    },
-  ];
-
-  validationTickets: Ticket[] = this.tickets.slice(0, 4);
+  tickets: Ticket[] = [];
+  validationTickets: Ticket[] = [];
 
   generateForm: GenerateForm = {
     category: '',
