@@ -20,30 +20,30 @@ describe("DashboardComponent", () => {
 
   describe("Component Initialization", () => {
     it("should create", () => {
-      expect(component).toBeTruthy()
-    })
+      expect(component).toBeTruthy();
+    });
 
     it("should initialize with dashboard tab active", () => {
-      expect(component.activeTab).toBe("dashboard")
-    })
+      expect(component.activeTab).toBe("dashboard");
+    });
 
-    it("should initialize with default event data", () => {
-      expect(component.currentEvent.name).toBe("Wenas Nights")
-      expect(component.currentEvent.id).toBe("EV001")
-      expect(component.currentEvent.totalCount).toBe(600)
-    })
+    it("should initialize with empty event data", () => {
+      expect(component.currentEvent.name).toBe("No Event Selected");
+      expect(component.currentEvent.id).toBe("");
+      expect(component.currentEvent.totalCount).toBe(0);
+    });
 
-    it("should initialize with default stats", () => {
-      expect(component.dashboardStats.totalRevenue).toBe("LKR 152,000")
-      expect(component.dashboardStats.ticketSales).toBe(121)
-      expect(component.dashboardStats.availableTickets).toBe(322)
-    })
+    it("should initialize with empty stats", () => {
+      expect(component.dashboardStats.totalRevenue).toBe("LKR 0");
+      expect(component.dashboardStats.ticketSales).toBe(0);
+      expect(component.dashboardStats.availableTickets).toBe(0);
+    });
 
-    it("should initialize with sample tickets", () => {
-      expect(component.tickets.length).toBe(6)
-      expect(component.validationTickets.length).toBe(4)
-    })
-  })
+    it("should initialize with empty tickets", () => {
+      expect(component.tickets.length).toBe(0);
+      expect(component.validationTickets.length).toBe(0);
+    });
+  });
 
   describe("Tab Navigation", () => {
     it("should switch to tickets tab", () => {
