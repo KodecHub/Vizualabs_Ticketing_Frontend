@@ -44,12 +44,18 @@
           <p class="limits">Limits: {{ currentEvent.limits }}</p>
         </div>
         <div class="event-actions">
-          <button class="action-btn delete-btn" (click)="deleteEvent()" type="button" title="Delete Event"
-            aria-label="Delete Event">
+          <button class="action-btn delete-btn" 
+                  (click)="deleteEvent()" 
+                  type="button" 
+                  title="Delete Event"
+                  aria-label="Delete Event">
             <img [src]="icons.delete" alt="Delete" class="action-icon-img">
           </button>
-          <button class="action-btn edit-btn" (click)="editEvent()" type="button" title="Edit Event"
-            aria-label="Edit Event">
+          <button class="action-btn edit-btn" 
+                  (click)="editEvent()" 
+                  type="button"
+                  title="Edit Event"
+                  aria-label="Edit Event">
             <img [src]="icons.edit" alt="Edit" class="action-icon-img">
           </button>
         </div>

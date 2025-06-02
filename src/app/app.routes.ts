@@ -17,4 +17,12 @@ export const routes: Routes = [
         path: '',
         redirectTo: '/booking', pathMatch: 'full'
     },
+    {
+        path: 'terms-and-conditions',
+        loadComponent: () => import('./pages/terms-and-conditions/terms-and-conditions.component').then(m => m.TermsAndConditionsComponent)
+    },
+    {
+        path: 'privacy-policy',
+        loadComponent: () => import('./pages/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent)
+    }
 ];
