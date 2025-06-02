@@ -23,4 +23,8 @@ export class EventService {
       params,
     });
   }
+
+  getEvent(eventId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/event/${eventId}`);
+  }
 }

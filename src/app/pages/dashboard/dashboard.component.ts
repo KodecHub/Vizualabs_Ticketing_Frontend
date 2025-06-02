@@ -67,7 +67,7 @@ export class DashboardComponent {
   constructor(private eventService: EventService) {}
 
   ngOnInit(): void {
-    this.loadFromLocalStorage();
+    this.loadEventData();
     this.updateValidationTickets();
   }
 
@@ -240,6 +240,45 @@ export class DashboardComponent {
           },
         });
     }
+  }
+
+  private loadEventData(): void {
+    const eventId = 'EV001'; 
+    this.eventService.getEvent(eventId).subscribe({
+      next: (data) => {
+        if (data) {
+          this.currentEvent = {
+            name: data.name,
+            id: data.eventId,
+            totalCount: Object.values(data.categoryLimits).reduce(
+              (sum: number, count: unknown) => sum + Number(count),
+              0
+            ),
+            limits: Object.entries(data.categoryLimits)
+              .map(([price, count]) => `Price ${price} (${count})`)
+              .join(','),
+          };
+          this.dashboardStats = {
+            totalRevenue: 'LKR 0', 
+            ticketSales: Object.values(data.categorySoldTickets).reduce(
+              (sum: number, count: unknown) => sum + Number(count),
+              0
+            ),
+            availableTickets: this.currentEvent.totalCount - this.dashboardStats.ticketSales,
+          };
+
+          this.ticketStats = {
+            sales: this.dashboardStats.ticketSales,
+            available: this.dashboardStats.availableTickets,
+          };
+
+          this.saveToLocalStorage();
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching event data:', error);
+      },
+    });
   }
 
   isEventFormValid(): boolean {
