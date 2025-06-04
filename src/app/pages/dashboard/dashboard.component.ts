@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../services/event.service';
+import { TicketService } from '../../services/ticket.service'; 
 
 interface Event {
   id: string;
@@ -64,7 +65,10 @@ export class DashboardComponent {
   showCreateEventModal = false;
   ticketIdToValidate = '';
 
-  constructor(private eventService: EventService) {}
+  constructor(
+    private eventService: EventService,
+    private ticketService: TicketService 
+  ) {}
 
   ngOnInit(): void {
     this.loadEventData();
@@ -87,12 +91,14 @@ export class DashboardComponent {
   };
 
   categoryOptions = [
+    { value: 'VVIP TABLE', label: 'VVIP TABLE' },
     { value: 'VVIP', label: 'VVIP' },
     { value: 'VIP', label: 'VIP' },
-    { value: 'General', label: 'General' },
+    { value: 'General', label: 'GENERAL' },
   ];
 
   priceOptions = [
+    { value: 75000, label: 'LKR 75,000' },
     { value: 7500, label: 'LKR 7,500' },
     { value: 5000, label: 'LKR 5,000' },
     { value: 3500, label: 'LKR 3,500' },
@@ -162,30 +168,51 @@ export class DashboardComponent {
     if (
       this.generateForm.category &&
       this.generateForm.count &&
-      this.generateForm.count > 0
+      this.generateForm.count > 0 &&
+      this.currentEvent.id
     ) {
-      const newTickets: Ticket[] = [];
-
-      for (let i = 0; i < this.generateForm.count; i++) {
-        newTickets.push({
-          id: this.currentEvent.id,
-          event: this.currentEvent.name,
-          name: `Generated User ${this.tickets.length + i + 1}`,
-          category: this.generateForm.category,
-          status: 'Active',
-          selected: false,
-        });
-      }
-
-      this.tickets = [...this.tickets, ...newTickets];
-      this.updateStats(this.generateForm.count);
-      this.updateValidationTickets();
-      this.saveToLocalStorage();
-      this.closeGenerateModal();
-
-      this.showSuccessMessage(
-        `Successfully generated ${this.generateForm.count} ${this.generateForm.category} tickets!`
+      const eventId = this.currentEvent.id;
+      const count = this.generateForm.count;
+      // Find the selected price for the chosen category
+      const selectedCategory = this.eventForm.categories.find(
+        (cat) => cat.name === this.generateForm.category
       );
+      const category = selectedCategory && selectedCategory.price !== null ? selectedCategory.price : 0;
+
+      this.ticketService.generateBulkQR(eventId, count, category).subscribe((response: Blob) => {
+        const url = window.URL.createObjectURL(response);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bulk_qr_codes_${eventId}_${category}_${new Date().toISOString()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        // Generate ticket data for display
+        const newTickets: Ticket[] = [];
+        for (let i = 0; i < count; i++) {
+          newTickets.push({
+            id: `${eventId}_${Date.now()}_${i}`, // Unique ID
+            event: this.currentEvent.name,
+            name: `Generated User ${this.tickets.length + i + 1}`,
+            category: this.generateForm.category,
+            status: 'Active',
+            selected: false,
+          });
+        }
+
+        this.tickets = [...this.tickets, ...newTickets];
+        this.updateStats(count);
+        this.updateValidationTickets();
+        this.closeGenerateModal();
+
+        this.showSuccessMessage(
+          `Successfully generated ${count} ${this.generateForm.category} tickets and downloaded PDF!`
+        );
+      }, error => {
+        console.error('Error generating QR codes:', error);
+      });
     }
   }
 
@@ -227,7 +254,6 @@ export class DashboardComponent {
 
               this.resetStatsForNewEvent(totalCount);
               this.clearTickets();
-              this.saveToLocalStorage();
               this.closeCreateEventModal();
             }
 
@@ -243,7 +269,7 @@ export class DashboardComponent {
   }
 
   private loadEventData(): void {
-    const eventId = 'EV001'; 
+    const eventId = 'EV001';
     this.eventService.getEvent(eventId).subscribe({
       next: (data) => {
         if (data) {
@@ -259,7 +285,7 @@ export class DashboardComponent {
               .join(','),
           };
           this.dashboardStats = {
-            totalRevenue: 'LKR 0', 
+            totalRevenue: 'LKR 0',
             ticketSales: Object.values(data.categorySoldTickets).reduce(
               (sum: number, count: unknown) => sum + Number(count),
               0
@@ -271,8 +297,6 @@ export class DashboardComponent {
             sales: this.dashboardStats.ticketSales,
             available: this.dashboardStats.availableTickets,
           };
-
-          this.saveToLocalStorage();
         }
       },
       error: (error) => {
@@ -321,7 +345,6 @@ export class DashboardComponent {
       };
       this.resetStatsForNewEvent(0);
       this.clearTickets();
-      this.saveToLocalStorage();
       this.showSuccessMessage('Event deleted successfully!');
     }
   }
@@ -374,7 +397,6 @@ export class DashboardComponent {
     ) {
       this.tickets = this.tickets.filter((ticket) => !ticket.selected);
       this.updateValidationTickets();
-      this.saveToLocalStorage();
       this.showSuccessMessage(`${selectedCount} tickets deleted successfully!`);
     }
   }
@@ -382,8 +404,6 @@ export class DashboardComponent {
   trackByTicketId(index: number, ticket: Ticket): string {
     return ticket.id + ticket.name + ticket.category;
   }
-
-  // === Private Methods ===
 
   private resetGenerateForm(): void {
     this.generateForm = {
@@ -441,10 +461,6 @@ export class DashboardComponent {
     this.validationStats.participants = this.tickets.length;
   }
 
-  // private generateEventId(): string {
-  //   return `EV${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-  // }
-
   private showSuccessMessage(message: string): void {
     alert(message);
   }
@@ -459,24 +475,5 @@ export class DashboardComponent {
 
   private confirmAction(message: string): boolean {
     return confirm(message);
-  }
-
-  private saveToLocalStorage(): void {
-    localStorage.setItem('currentEvent', JSON.stringify(this.currentEvent));
-    localStorage.setItem('tickets', JSON.stringify(this.tickets));
-    localStorage.setItem('dashboardStats', JSON.stringify(this.dashboardStats));
-    localStorage.setItem('ticketStats', JSON.stringify(this.ticketStats));
-  }
-
-  private loadFromLocalStorage(): void {
-    const event = localStorage.getItem('currentEvent');
-    const tickets = localStorage.getItem('tickets');
-    const dashboard = localStorage.getItem('dashboardStats');
-    const stats = localStorage.getItem('ticketStats');
-
-    if (event) this.currentEvent = JSON.parse(event);
-    if (tickets) this.tickets = JSON.parse(tickets);
-    if (dashboard) this.dashboardStats = JSON.parse(dashboard);
-    if (stats) this.ticketStats = JSON.parse(stats);
   }
 }

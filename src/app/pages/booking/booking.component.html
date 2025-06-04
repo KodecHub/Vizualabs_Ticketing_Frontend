@@ -3,7 +3,7 @@
     <h1 class="event-title">Wenas Nights</h1>
     <p class="event-subtitle">BNS, Raini, Sarith Surith with News</p>
     <div class="event-details">
-      <p class="event-date">2025/10/06</p>
+      <p class="event-date">2025/09/06</p>
       <p class="event-location">Saffron Beach hotel, Wadduwa</p>
     </div>
   </div>
@@ -52,6 +52,7 @@
             <div class="dropdown-item" (click)="selectTicket('GENERAL')">GENERAL</div>
             <div class="dropdown-item" (click)="selectTicket('VIP')">VIP</div>
             <div class="dropdown-item" (click)="selectTicket('VVIP')">VVIP</div>
+            <div class="dropdown-item" (click)="selectTicket('VVIP TABLE')">VVIP TABLE</div>
           </div>
         </div>
 
@@ -78,8 +79,8 @@
         </div>
 
         <div class="summary-item">
-          <span class="item-name">Convenience Fee</span>
-          <span class="item-fee">+ {{ convenienceFee }}.00 LKR</span>
+          <span class="item-name">Convenience Fee 1%</span>
+          <span class="item-fee">+ {{ calculateConvenienceFee() }}.00 LKR</span>
         </div>
       </div>
 
@@ -87,7 +88,7 @@
 
       <div class="summary-total">
         <span class="total-label">Total</span>
-        <span class="total-amount">+ {{ calculateTotal() }}.00 LKR</span>
+        <span class="total-amount">{{ calculateTotal() }}.00 LKR</span>
       </div>
 
       <div class="summary-divider"></div>

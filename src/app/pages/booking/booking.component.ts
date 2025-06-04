@@ -16,17 +16,16 @@ export class BookingComponent {
   selectedTicket: string = 'GENERAL';
   quantity: number = 1;
   ticketPrice: number = 3500;
-  convenienceFee: number = 35;
   showDropdown: boolean = false;
 
   constructor(private fb: FormBuilder, private router: Router) {
-  this.bookingForm = this.fb.group({
-    name: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    phone: ['', Validators.required],
-    nic: ['', Validators.required]
-  });
-}
+    this.bookingForm = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required],
+      nic: ['', Validators.required]
+    });
+  }
 
   toggleDropdown() {
     this.showDropdown = !this.showDropdown;
@@ -44,6 +43,8 @@ export class BookingComponent {
       case 'VVIP':
         this.ticketPrice = 7500;
         break;
+      case 'VVIP TABLE':
+        this.ticketPrice = 75000; 
     }
     this.showDropdown = false;
   }
@@ -58,29 +59,33 @@ export class BookingComponent {
     }
   }
 
+  calculateConvenienceFee(): number {
+    return this.ticketPrice * this.quantity * 0.01;
+  }
+
   calculateTotal(): number {
-    return (this.ticketPrice * this.quantity) + this.convenienceFee;
+    return (this.ticketPrice * this.quantity) + this.calculateConvenienceFee();
   }
 
   bookNow() {
-  if (this.bookingForm.invalid) {
-    this.bookingForm.markAllAsTouched();
-    return;
-  }
+    if (this.bookingForm.invalid) {
+      this.bookingForm.markAllAsTouched();
+      return;
+    }
 
-  const bookingDetails = {
-    ...this.bookingForm.value,
-    ticket: this.selectedTicket,
-    quantity: this.quantity,
-    total: this.calculateTotal()
-  };
+    const bookingDetails = {
+      ...this.bookingForm.value,
+      ticket: this.selectedTicket,
+      quantity: this.quantity,
+      total: this.calculateTotal()
+    };
 
-  console.log('Booking Details:', bookingDetails);
+    console.log('Booking Details:', bookingDetails);
 
-  this.router.navigate(['/qr'], { 
-    state: { bookingData: bookingDetails }
-  });
+    this.router.navigate(['/qr'], { 
+      state: { bookingData: bookingDetails }
+    });
 
-  alert('Booking successful! Redirecting to your ticket...');
+    alert('Booking successful! Redirecting to your ticket...');
   }
 }

@@ -20,13 +20,17 @@ describe('BookingComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should calculate total correctly', () => {
+  it('should calculate convenience fee as 1% of ticket price per ticket', () => {
     component.ticketPrice = 3500;
     component.quantity = 2;
-    component.convenienceFee = 35;
-    
+    expect(component.calculateConvenienceFee()).toBe(70); // 3500 * 2 * 0.01
+  });
+
+  it('should calculate total correctly with dynamic convenience fee', () => {
+    component.ticketPrice = 3500;
+    component.quantity = 2;
     const total = component.calculateTotal();
-    expect(total).toBe(7035);
+    expect(total).toBe(7070); // (3500 * 2) + (3500 * 2 * 0.01)
   });
 
   it('should decrease quantity but not below 1', () => {
@@ -54,5 +58,8 @@ describe('BookingComponent', () => {
     
     component.selectTicket('GENERAL');
     expect(component.ticketPrice).toBe(3500);
+
+    component.selectTicket('VVIP TABLE');
+    expect(component.ticketPrice).toBe(75000);
   });
 });
