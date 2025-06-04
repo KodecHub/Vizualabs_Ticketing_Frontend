@@ -4,6 +4,7 @@
   padding: 2rem 0;
   margin-top: auto;
   box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+  font-family: poppins, sans-serif;
 }
 .container {
   max-width: 1200px;
