@@ -1,0 +1,55 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Admin Login</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          placeholder="Enter your email" 
+          class="input-field"
+          [attr.aria-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          aria-describedby="email-error"
+        >
+        <div 
+          *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" 
+          class="error" 
+          id="email-error"
+        >
+          <div *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</div>
+          <div *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          placeholder="Enter your password" 
+          class="input-field"
+          [attr.aria-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          aria-describedby="password-error"
+        >
+        <div 
+          *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" 
+          class="error" 
+          id="password-error"
+        >
+          <div *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</div>
+        </div>
+      </div>
+      <div *ngIf="errorMessage" class="error general-error">{{ errorMessage }}</div>
+      <button 
+        type="submit" 
+        class="btn-primary btn-full" 
+        [disabled]="loginForm.invalid"
+        aria-label="Log in"
+      >
+        Log In
+      </button>
+    </form>
+  </div>
+</div>
