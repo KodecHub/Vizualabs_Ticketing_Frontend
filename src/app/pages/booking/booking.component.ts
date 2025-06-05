@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { BookingService, BookingData } from '../../services/booking.service';
+import { BookingService, TicketRequest } from '../../services/booking.service';
 
 @Component({
   selector: 'app-booking',
@@ -19,11 +19,11 @@ export class BookingComponent {
   showDropdown: boolean = false;
 
   private ticketTypeMap: { [key: string]: number } = {
-    'GENERAL': 1,
-    'VIP': 2,
-    'VVIP': 3,    
-    'VVIP TABLE': 4
-  }
+    'GENERAL': 3500,
+    'VIP': 5000,
+    'VVIP': 7500,
+    'VVIP TABLE': 75000
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -33,9 +33,16 @@ export class BookingComponent {
     this.bookingForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      confirmEmail: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
       nic: ['', Validators.required]
-    });
+    }, { validators: this.emailMatchValidator });
+  }
+
+  emailMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const email = control.get('email')?.value;
+    const confirmEmail = control.get('confirmEmail')?.value;
+    return email === confirmEmail ? null : { emailMismatch: true };
   }
 
   toggleDropdown() {
@@ -44,19 +51,7 @@ export class BookingComponent {
 
   selectTicket(ticket: string) {
     this.selectedTicket = ticket;
-    switch (ticket) {
-      case 'GENERAL':
-        this.ticketPrice = 3500;
-        break;
-      case 'VIP':
-        this.ticketPrice = 5000;
-        break;
-      case 'VVIP':
-        this.ticketPrice = 7500;
-        break;
-      case 'VVIP TABLE':
-        this.ticketPrice = 75000; 
-    }
+    this.ticketPrice = this.ticketTypeMap[ticket];
     this.showDropdown = false;
   }
 
@@ -84,31 +79,34 @@ export class BookingComponent {
       return;
     }
 
-    const bookingData: BookingData = {
+    const request: TicketRequest = {
       name: this.bookingForm.value.name,
       email: this.bookingForm.value.email,
-      phoneNumber: this.bookingForm.value.phone, 
+      phoneNumber: this.bookingForm.value.phone,
       nic: this.bookingForm.value.nic,
-      categoryQuantities: { [this.ticketTypeMap[this.selectedTicket]]: this.quantity }, 
-      eventId: 'EV001' 
+      eventId: 'EV001',
+      categoryQuantities: this.selectedTicket === 'VVIP TABLE' 
+        ? { [this.ticketTypeMap['VVIP']]: this.quantity * 10 }
+        : { [this.ticketTypeMap[this.selectedTicket]]: this.quantity }
     };
 
-    console.log('Sending Booking Data:', bookingData); 
+    console.log('Sending Ticket Request:', request);
 
-    this.bookingService.bookTicket(bookingData).subscribe({
+    this.bookingService.bookTicket(request).subscribe({
       next: (response) => {
-        if (response) {
-          console.log('Booking successful', response);
-          this.router.navigate(['/qr'], { state: { bookingData: response.bookingData } });
-          alert('Booking successful! Your ticket details have been sent to your email.');
-        } else {
-          console.error('Received null response from backend');
-          alert('Booking failed: No response from server.');
-        }
+        console.log('Booking successful', response);
+        this.router.navigate(['/qr'], { state: { ticketResponse: response } });
+        alert('Booking successful! Your ticket has been reserved. Email delivery may be delayed.');
       },
       error: (error) => {
-        console.error('Booking failed', error);
-        alert('Booking failed: ' + error.message);
+        console.error('Booking error', error);
+        if (error.status === 500) {
+          // Assume ticket is saved, as generateTicket saves before email
+          alert('Booking successful, but email delivery failed. Check your QR code or contact support.');
+          this.router.navigate(['/qr'], { state: { ticketResponse: null } });
+        } else {
+          alert('Booking failed: ' + (error.error?.message ?? 'Unknown error'));
+        }
       }
     });
   }
