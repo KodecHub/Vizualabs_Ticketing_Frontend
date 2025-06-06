@@ -1,43 +1,35 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common'; 
+import { FormsModule } from '@angular/forms'; 
+import { LoginService } from '../../services/login.service';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  standalone: true, 
+  imports: [CommonModule, FormsModule], 
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  errorMessage: string | null = null;
+  email: string = '';
+  password: string = '';
+  error: string = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
-    });
-  }
+  constructor(private loginService: LoginService, private router: Router) {}
 
   onSubmit() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
-    }
-
-    const { email, password } = this.loginForm.value;
-
-    if (email === 'admin@admin.com' && password === '1234') {
-      localStorage.setItem('adminToken', 'authenticated');
-      this.router.navigate(['/dashboard']);
-      this.errorMessage = null;
-    } else {
-      this.errorMessage = 'Invalid email or password';
-    }
+    this.loginService.login(this.email, this.password).subscribe({
+      next: (isValid) => {
+        if (isValid) {
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.error = 'Invalid email or password';
+        }
+      },
+      error: () => {
+        this.error = 'Login failed. Please try again.';
+      },
+    });
   }
 }

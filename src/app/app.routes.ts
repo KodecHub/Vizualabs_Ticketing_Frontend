@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { BannerComponent } from './pages/banner/banner.component';
-import { AuthGuard } from './guards/auth';
 
 export const routes: Routes = [
   {
@@ -9,16 +8,15 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
   {
     path: 'booking',
     loadComponent: () => import('./pages/booking/booking.component').then(m => m.BookingComponent)
-  },
-  {
-    path: 'dashboard',
-    loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [AuthGuard]
   },
   {
     path: 'terms-and-conditions',
