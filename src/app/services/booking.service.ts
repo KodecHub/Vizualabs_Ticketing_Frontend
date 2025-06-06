@@ -29,4 +29,9 @@ export class BookingService {
   bookTicket(bookingData: BookingData): Observable<TicketResponse> {
     return this.http.post<TicketResponse>(`${this.baseUrl}/tickets/generate`, bookingData);
   }
+  
+  createTransaction(requestBody: any): Observable<any> {
+  return this.http.post('http://localhost:8080/api/transactions', requestBody); // Pointing to your Spring Boot backend
+}
+
 }
