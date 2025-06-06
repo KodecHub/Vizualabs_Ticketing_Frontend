@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BookingService, TicketRequest } from '../../services/booking.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-booking',
@@ -76,6 +77,12 @@ export class BookingComponent {
   bookNow() {
     if (this.bookingForm.invalid) {
       this.bookingForm.markAllAsTouched();
+      Swal.fire({
+        icon: 'error',
+        title: 'Form Invalid',
+        text: 'Please fill out all required fields correctly.',
+        confirmButtonText: 'OK',
+      });
       return;
     }
 
@@ -95,17 +102,35 @@ export class BookingComponent {
     this.bookingService.bookTicket(request).subscribe({
       next: (response) => {
         console.log('Booking successful', response);
-        this.router.navigate(['/qr'], { state: { ticketResponse: response } });
-        alert('Booking successful! Your ticket has been reserved. Email delivery may be delayed.');
+        Swal.fire({
+          icon: 'success',
+          title: 'Booking Successful',
+          text: 'Your ticket has been reserved. Email delivery may be delayed.',
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          this.router.navigate(['/qr'], { state: { ticketResponse: response } });
+        });
       },
       error: (error) => {
         console.error('Booking error', error);
         if (error.status === 500) {
-          // Assume ticket is saved, as generateTicket saves before email
-          alert('Booking successful, but email delivery failed. Check your QR code or contact support.');
-          this.router.navigate(['/qr'], { state: { ticketResponse: null } });
+          Swal.fire({
+            icon: 'warning',
+            title: 'Booking Successful',
+            text: 'Ticket reserved, but email delivery failed. Check your QR code or contact support.',
+            timer: 2000,
+            showConfirmButton: false,
+          }).then(() => {
+            this.router.navigate(['/qr'], { state: { ticketResponse: null } });
+          });
         } else {
-          alert('Booking failed: ' + (error.error?.message ?? 'Unknown error'));
+          Swal.fire({
+            icon: 'error',
+            title: 'Booking Failed',
+            text: error.error?.message ?? 'Unknown error occurred.',
+            confirmButtonText: 'OK',
+          });
         }
       }
     });

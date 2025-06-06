@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,32 @@ export class TicketService {
   generateBulkQR(
     eventId: string,
     count: number,
-    category: number // Keep as number if backend expects a price/ID, otherwise change to string
+    category: number
   ): Observable<Blob> {
     const url = `${this.baseUrl}/${eventId}/${count}/${category}`;
-    return this.http.post(url, null, { responseType: 'blob' });
+    return this.http.post(url, null, { responseType: 'blob' }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.error instanceof Blob) {
+          return new Observable<never>((observer) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              try {
+                const errorJson = JSON.parse(reader.result as string);
+                observer.error(new HttpErrorResponse({
+                  error: errorJson,
+                  status: error.status,
+                  statusText: error.statusText
+                }));
+              } catch (e) {
+                observer.error(error);
+              }
+            };
+            reader.onerror = () => observer.error(error);
+            reader.readAsText(error.error);
+          });
+        }
+        return throwError(() => error);
+      })
+    );
   }
 }

@@ -232,14 +232,14 @@
     </div>
     <form (ngSubmit)="generateTickets()" #generateTicketForm="ngForm">
       <div class="form-group">
+        <label for="categorySelect">Ticket Category</label>
         <select [(ngModel)]="generateForm.category" name="category" id="categorySelect" class="input-field" required>
           <option value="">Select category</option>
-          <option value="VVIP">VVIP</option>
-          <option value="VIP">VIP</option>
-          <option value="General">General</option>
+          <option *ngFor="let category of eventForm.categories" [value]="category.name">{{ category.name }}</option>
         </select>
       </div>
       <div class="form-group">
+        <label for="countInput">Number of Tickets</label>
         <input type="number" [(ngModel)]="generateForm.count" name="count" id="countInput" placeholder="Count"
           class="input-field" min="1" max="1000" required>
       </div>
