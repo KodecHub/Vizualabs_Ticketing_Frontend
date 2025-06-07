@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BookingService, TicketRequest } from '../../services/booking.service';
+import { PaymentService } from '../../services/payment.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,7 +20,7 @@ export class BookingComponent {
   ticketPrice: number = 3500;
   showDropdown: boolean = false;
 
-  private ticketTypeMap: { [key: string]: number } = {
+  private readonly ticketTypeMap: { [key: string]: number } = {
     'GENERAL': 3500,
     'VIP': 5000,
     'VVIP': 7500,
@@ -27,9 +28,10 @@ export class BookingComponent {
   };
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private bookingService: BookingService
+    private readonly fb: FormBuilder,
+    private readonly router: Router,
+    private readonly bookingService: BookingService,
+    private readonly paymentService: PaymentService
   ) {
     this.bookingForm = this.fb.group({
       name: ['', Validators.required],
@@ -94,18 +96,19 @@ export class BookingComponent {
       eventId: 'EV001',
       categoryQuantities: this.selectedTicket === 'VVIP TABLE' 
         ? { [this.ticketTypeMap['VVIP']]: this.quantity * 10 }
-        : { [this.ticketTypeMap[this.selectedTicket]]: this.quantity }
+        : { [this.ticketTypeMap[this.selectedTicket]]: this.quantity },
+      totalAmount: this.calculateTotal() 
     };
 
-    console.log('Sending Ticket Request:', request);
+    console.log('Sending Payment Request:', request);
 
-    this.bookingService.bookTicket(request).subscribe({
+    this.paymentService.initiatePayment(request).subscribe({
       next: (response) => {
-        console.log('Booking successful', response);
+        console.log('Payment and Booking successful', response);
         Swal.fire({
           icon: 'success',
           title: 'Booking Successful',
-          text: 'Your ticket has been reserved. Email delivery may be delayed.',
+          text: 'Your ticket has been reserved and email sent.',
           timer: 1500,
           showConfirmButton: false,
         }).then(() => {
@@ -113,25 +116,13 @@ export class BookingComponent {
         });
       },
       error: (error) => {
-        console.error('Booking error', error);
-        if (error.status === 500) {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Booking Successful',
-            text: 'Ticket reserved, but email delivery failed. Check your QR code or contact support.',
-            timer: 2000,
-            showConfirmButton: false,
-          }).then(() => {
-            this.router.navigate(['/qr'], { state: { ticketResponse: null } });
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Booking Failed',
-            text: error.error?.message ?? 'Unknown error occurred.',
-            confirmButtonText: 'OK',
-          });
-        }
+        console.error('Payment error', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Payment Failed',
+          text: 'Payment processing failed. Please try again.',
+          confirmButtonText: 'OK',
+        });
       }
     });
   }

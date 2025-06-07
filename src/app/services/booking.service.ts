@@ -9,6 +9,7 @@ export interface TicketRequest {
   nic: string;
   eventId: string;
   categoryQuantities: { [key: number]: number };
+  totalAmount: number; // Added totalAmount field
 }
 
 export interface TicketResponse {
