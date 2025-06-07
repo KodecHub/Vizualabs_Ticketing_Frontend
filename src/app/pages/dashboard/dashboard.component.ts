@@ -63,6 +63,8 @@ interface EventForm {
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
+  isGenerating = false; // Fixed syntax error
+
   // UI state
   activeTab = 'dashboard';
   showGenerateModal = false;
@@ -287,6 +289,7 @@ export class DashboardComponent implements OnInit {
       this.generateForm.count > 0 &&
       this.currentEvent.id
     ) {
+      this.isGenerating = true; // Disable the button
       const normalizedCategory = this.normalizeCategoryName(this.generateForm.category);
       console.log('generateForm.category:', normalizedCategory);
       console.log('eventForm.categories:', this.eventForm.categories);
@@ -299,6 +302,7 @@ export class DashboardComponent implements OnInit {
         this.showErrorMessage(
           `Invalid ticket category selected: ${this.generateForm.category}. Please select a category defined for this event.`
         );
+        this.isGenerating = false; // Re-enable button on validation failure
         return;
       }
 
@@ -338,6 +342,7 @@ export class DashboardComponent implements OnInit {
           this.showSuccessMessage(
             `Successfully generated ${count} ${normalizedCategory} tickets and downloaded PDF!`
           );
+          this.isGenerating = false; // Re-enable button on success
         },
         error: (error: HttpErrorResponse) => {
           console.error('Error generating QR codes:', error);
@@ -345,10 +350,12 @@ export class DashboardComponent implements OnInit {
             ? error.error.message
             : 'Failed to generate QR codes. Please check the backend and try again.';
           this.showErrorMessage(errorMessage);
+          this.isGenerating = false; // Re-enable button on error
         },
       });
     } else {
       this.showErrorMessage('Please fill in all required fields for ticket generation.');
+      this.isGenerating = false; // Ensure button is re-enabled if validation fails
     }
   }
 
@@ -537,7 +544,6 @@ export class DashboardComponent implements OnInit {
     };
   }
 
-  // Update statistics after ticket generation
   private updateStats(count: number): void {
     this.ticketStats.sales += count;
     this.dashboardStats.ticketSales += count;
@@ -545,7 +551,6 @@ export class DashboardComponent implements OnInit {
     this.dashboardStats.availableTickets = Math.max(0, this.dashboardStats.availableTickets - count);
   }
 
-  // Reset stats for a new event
   private resetStatsForNewEvent(totalCount: number): void {
     this.dashboardStats = {
       totalRevenue: 'LKR 0',
@@ -562,20 +567,17 @@ export class DashboardComponent implements OnInit {
     };
   }
 
-  // Clear all tickets
   private clearTickets(): void {
     this.tickets = [];
     this.validationTickets = [];
   }
 
-  // Update validation tickets
   private updateValidationTickets(): void {
     this.validationTickets = this.tickets.slice(0, 4);
     this.validationStats.activeTickets = this.tickets.length;
     this.validationStats.participants = this.tickets.length;
   }
 
-  // Show success message
   private async showSuccessMessage(message: string): Promise<void> {
     await Swal.fire({
       icon: 'success',
@@ -586,7 +588,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Show error message
   private async showErrorMessage(message: string): Promise<void> {
     await Swal.fire({
       icon: 'error',
@@ -596,7 +597,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Show info message
   private async showInfoMessage(message: string): Promise<void> {
     await Swal.fire({
       icon: 'info',
@@ -606,7 +606,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Confirm action
   private async confirmAction(message: string): Promise<boolean> {
     const result = await Swal.fire({
       icon: 'warning',
@@ -619,3 +618,5 @@ export class DashboardComponent implements OnInit {
     return result.isConfirmed;
   }
 }
+
+

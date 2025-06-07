@@ -232,20 +232,20 @@
     </div>
     <form (ngSubmit)="generateTickets()" #generateTicketForm="ngForm">
       <div class="form-group">
-        <label for="categorySelect">Ticket Category</label>
         <select [(ngModel)]="generateForm.category" name="category" id="categorySelect" class="input-field" required>
           <option value="">Select category</option>
-          <option *ngFor="let category of eventForm.categories" [value]="category.name">{{ category.name }}</option>
+          <option value="VVIP">VVIP</option>
+          <option value="VIP">VIP</option>
+          <option value="General">General</option>
         </select>
       </div>
       <div class="form-group">
-        <label for="countInput">Number of Tickets</label>
         <input type="number" [(ngModel)]="generateForm.count" name="count" id="countInput" placeholder="Count"
           class="input-field" min="1" max="1000" required>
       </div>
       <div class="modal-actions">
-        <button type="submit" class="btn-primary btn-full" [disabled]="!generateTicketForm.form.valid">
-          Generate Ticket
+        <button id="generate-tickets-button" class="btn-primary generate-btn" [disabled]="isGenerating || !generateTicketForm.form.valid" type="submit">
+          {{ isGenerating ? 'Generating...' : 'Generate Tickets' }}
         </button>
       </div>
     </form>
