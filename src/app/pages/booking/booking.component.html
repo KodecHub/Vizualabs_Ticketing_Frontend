@@ -3,8 +3,8 @@
     <h1 class="event-title">Wenas Nights</h1>
     <p class="event-subtitle">BNS, Raini, Sarith Surith with News</p>
     <div class="event-details">
-      <p class="event-date">2025/10/06</p>
-      <p class="event-location">Saffron Beach hotel, Wadduwa</p>
+      <p class="event-date">2025/09/06</p>
+      <p class="event-location">Saffron Beach Hotel, Wadduwa</p>
     </div>
   </div>
 
@@ -17,12 +17,25 @@
           Name is required.
         </div>
       </div>
-
+      
       <div class="form-group">
         <label for="email">Email</label>
         <input type="email" id="email" formControlName="email" placeholder="Enter a valid email address" />
         <div class="error" *ngIf="bookingForm.get('email')?.touched && bookingForm.get('email')?.invalid">
-          Valid email is required.
+          <div *ngIf="bookingForm.get('email')?.errors?.['required']">Email is required.</div>
+          <div *ngIf="bookingForm.get('email')?.errors?.['email']">Please enter a valid email address.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmEmail">Confirm Email</label>
+        <input type="email" id="confirmEmail" formControlName="confirmEmail" placeholder="Confirm your email address" />
+        <div class="error" *ngIf="bookingForm.get('confirmEmail')?.touched && bookingForm.get('confirmEmail')?.invalid">
+          <div *ngIf="bookingForm.get('confirmEmail')?.errors?.['required']">Confirm Email is required.</div>
+          <div *ngIf="bookingForm.get('confirmEmail')?.errors?.['email']">Please enter a valid email address.</div>
+        </div>
+        <div class="error" *ngIf="bookingForm.errors?.['emailMismatch'] && bookingForm.get('confirmEmail')?.touched">
+          Emails do not match.
         </div>
       </div>
 
@@ -52,11 +65,12 @@
             <div class="dropdown-item" (click)="selectTicket('GENERAL')">GENERAL</div>
             <div class="dropdown-item" (click)="selectTicket('VIP')">VIP</div>
             <div class="dropdown-item" (click)="selectTicket('VVIP')">VVIP</div>
+            <div class="dropdown-item" (click)="selectTicket('VVIP TABLE')">VVIP TABLE</div>
           </div>
         </div>
 
         <div class="quantity-selector">
-          <button type="button" class="quantity-btn" (click)="decreaseQuantity()">−</button>
+          <button type="button" class="quantity-btn" (click)="decreaseQuantity()" [disabled]="quantity <= 1">−</button>
           <input type="text" class="quantity-input" [value]="quantity" readonly />
           <button type="button" class="quantity-btn" (click)="increaseQuantity()">+</button>
         </div>
@@ -68,18 +82,18 @@
 
       <div class="summary-items">
         <div class="summary-item">
-          <span class="item-name">{{ selectedTicket }}</span>
-          <span class="item-price">{{ ticketPrice }}.00 LKR</span>
+          <span class="item-name">{{ selectedTicket || 'No ticket selected' }}</span>
+          <span class="item-price">{{ ticketPrice | number:'1.0-2' }} LKR</span>
         </div>
 
         <div class="summary-item">
-          <span class="item-name">Qty</span>
+          <span class="item-name">Quantity</span>
           <span class="item-qty">x{{ quantity }}</span>
         </div>
 
         <div class="summary-item">
-          <span class="item-name">Convenience Fee</span>
-          <span class="item-fee">+ {{ convenienceFee }}.00 LKR</span>
+          <span class="item-name">Convenience Fee (1%)</span>
+          <span class="item-fee">+ {{ calculateConvenienceFee() | number:'1.0-2' }} LKR</span>
         </div>
       </div>
 
@@ -87,12 +101,12 @@
 
       <div class="summary-total">
         <span class="total-label">Total</span>
-        <span class="total-amount">+ {{ calculateTotal() }}.00 LKR</span>
+        <span class="total-amount">{{ calculateTotal() | number:'1.0-2' }} LKR</span>
       </div>
 
       <div class="summary-divider"></div>
     </div>
   </div>
 
-  <button class="book-now-btn" (click)="bookNow()">Book Now</button>
+  <button class="book-now-btn" (click)="bookNow()" [disabled]="bookingForm.invalid">Book Now</button>
 </div>

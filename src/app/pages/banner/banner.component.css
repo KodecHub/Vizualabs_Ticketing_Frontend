@@ -86,19 +86,22 @@
 
     .prices {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: wrap; /* Allow wrapping on smaller screens */
       gap: 0.6rem;
       margin-top: 1.2rem;
       margin-bottom: 1.2rem;
+      justify-content: flex-start; /* Align items to the left */
     }
 
     .ticket {
       background: rgba(255, 255, 255, 0.1);
       padding: 0.4rem 0.8rem;
       border-radius: 40px;
+      font-size: clamp(0.85rem, 1.2vw, 1.2rem);
       font-size: 0.85rem;
       border: 1px solid rgba(255, 255, 255, 0.2);
       transition: all 0.3s ease;
+      white-space: nowrap;
     }
 
     .ticket:hover {
@@ -108,6 +111,7 @@
     }
 
     .separator {
+      margin: 0 0.5rem;
       display: none;
     }
 
@@ -135,73 +139,73 @@
       background-color: #0066e0;
     }
 
-    @media (max-width: 600px) {
-      .event-info-box {
-        padding: 1.2rem;
-      }
+/* Phones (320px - 600px) */
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
 
-      h1 {
-        font-size: 1.8rem;
-      }
+  .event-info-box {
+    padding: 1rem;
+    margin-top: -25px;
+  }
 
-      h1, h2 {
-        display: block;
-      }
+  .prices {
+    flex-direction: row; /* Force horizontal on small screens */
+    gap: 0.4rem;
+  }
 
-      h2 {
-        margin-left: 0;
-        margin-top: 5px;
-        font-size: 1.1rem;
-      }
+  .ticket {
+    width: auto; /* Allow natural width */
+    padding: 0.3rem 0.6rem;
+    font-size: 0.9rem;
+  }
 
-      button {
-        top: 12px;
-        right: 12px;
-        padding: 8px 16px;
-        font-size: 1rem;
-      }
-    }
+  button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    margin: 15px auto;
+  }
+}
 
-    @media (max-width: 480px) {
-      .container {
-        padding: 12px;
-      }
+@media (max-width: 480px) {
+  .prices {
+    flex-wrap: wrap; /* Allow wrapping if too many prices */
+    gap: 0.3rem;
+  }
 
-      h1 {
-        font-size: 1.5rem;
-        margin-bottom: 0.4rem;
-      }
+  .ticket {
+    font-size: 0.85rem;
+  }
 
-      h2 {
-        font-size: 1rem;
-        margin-bottom: 0.8rem;
-      }
+  button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
 
-      .event-info-box {
-        padding: 1.2rem;
-        margin-top: -30px;
-      }
+/* Tablets (601px - 1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .container {
+    max-width: 90%;
+    padding: 20px;
+  }
 
-      .details p {
-        font-size: 0.9rem;
-        margin-bottom: 6px;
-      }
+  .event-info-box {
+    padding: 1.5rem;
+    margin-top: -30px;
+  }
 
-      .prices {
-        flex-direction: column;
-        gap: 10px;
-        margin: 1.2rem 0;
-      }
+  .prices {
+    gap: 0.8rem;
+  }
 
-      .ticket {
-        width: 100%;
-        text-align: center;
-        padding: 0.6rem;
-      }
+  .ticket {
+    padding: 0.5rem 1rem;
+  }
 
-      button{
-        padding: 6px 14px;
-        font-size: 1rem;
-        margin-top: 1.2rem;
-      }
-    }
+  button {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+  }
+}

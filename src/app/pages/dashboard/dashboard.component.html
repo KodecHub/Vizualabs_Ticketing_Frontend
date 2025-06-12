@@ -244,8 +244,8 @@
           class="input-field" min="1" max="1000" required>
       </div>
       <div class="modal-actions">
-        <button type="submit" class="btn-primary btn-full" [disabled]="!generateTicketForm.form.valid">
-          Generate Ticket
+        <button id="generate-tickets-button" class="btn-primary generate-btn" [disabled]="isGenerating || !generateTicketForm.form.valid" type="submit">
+          {{ isGenerating ? 'Generating...' : 'Generate Tickets' }}
         </button>
       </div>
     </form>
@@ -279,7 +279,7 @@
               <option value="VVIP_TABLE">VVIP TABLE</option>
               <option value="VVIP">VVIP</option>
               <option value="VIP">VIP</option>
-              <option value="General">General</option>
+              <option value="General">GENERAL</option>
             </select>
             <select [(ngModel)]="category.price" [name]="'categoryPrice' + i" class="input-field" required>
               <option value="">Select Price</option>
