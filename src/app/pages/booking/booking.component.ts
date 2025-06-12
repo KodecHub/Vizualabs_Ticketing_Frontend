@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BookingService, TicketRequest } from '../../services/booking.service';
-import { PaymentService } from '../../services/payment.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -30,8 +29,7 @@ export class BookingComponent {
   constructor(
     private readonly fb: FormBuilder,
     private readonly router: Router,
-    private readonly bookingService: BookingService,
-    private readonly paymentService: PaymentService
+    private readonly bookingService: BookingService
   ) {
     this.bookingForm = this.fb.group({
       name: ['', Validators.required],
@@ -88,42 +86,70 @@ export class BookingComponent {
       return;
     }
 
-    const request: TicketRequest = {
-      name: this.bookingForm.value.name,
-      email: this.bookingForm.value.email,
-      phoneNumber: this.bookingForm.value.phone,
-      nic: this.bookingForm.value.nic,
-      eventId: 'EV001',
-      categoryQuantities: this.selectedTicket === 'VVIP TABLE' 
-        ? { [this.ticketTypeMap['VVIP']]: this.quantity * 10 }
-        : { [this.ticketTypeMap[this.selectedTicket]]: this.quantity },
-      totalAmount: this.calculateTotal() 
+    const requestPayload = {
+      amount: this.calculateTotal() * 100, 
+      currency: 'LKR'
     };
 
-    console.log('Sending Payment Request:', request);
-
-    this.paymentService.initiatePayment(request).subscribe({
-      next: (response) => {
-        console.log('Payment and Booking successful', response);
-        Swal.fire({
-          icon: 'success',
-          title: 'Booking Successful',
-          text: 'Your ticket has been reserved and email sent.',
-          timer: 1500,
-          showConfirmButton: false,
-        }).then(() => {
-          this.router.navigate(['/qr'], { state: { ticketResponse: response } });
-        });
+    this.bookingService.createTransaction(requestPayload).subscribe({
+      next: (res: any) => {
+        console.log('Sending Payment Request:', requestPayload);
+        console.log('Payment Response:', res);
+        if (res.url) {
+          console.log('Redirecting to Payment Gateway:', res.url);
+          window.location.href = res.url; 
+          const request: TicketRequest = {
+            name: this.bookingForm.value.name,
+            email: this.bookingForm.value.email,
+            phoneNumber: this.bookingForm.value.phone,
+            nic: this.bookingForm.value.nic,
+            eventId: 'EV001',
+            categoryQuantities: this.selectedTicket === 'VVIP TABLE'
+              ? { [this.ticketTypeMap['VVIP']]: this.quantity * 10 }
+              : { [this.ticketTypeMap[this.selectedTicket]]: this.quantity },
+            totalAmount: this.calculateTotal()
+          };
+          this.bookingService.bookTicket(request).subscribe({
+            next: (ticketRes) => {
+              console.log('Booking Successful:', ticketRes);
+              Swal.fire({
+                icon: 'success',
+                title: 'Booking Confirmed',
+                text: 'Your ticket has been reserved and email sent.',
+                timer: 1500,
+                showConfirmButton: false,
+              }).then(() => {
+                this.router.navigate(['/qr'], { state: { ticketResponse: ticketRes } });
+              });
+            },
+            error: (err) => {
+              console.error('Booking failed:', err);
+              Swal.fire({
+                icon: 'error',
+                title: 'Booking Failed',
+                text: 'Payment succeeded but booking failed. Please contact support.',
+                confirmButtonText: 'OK',
+              });
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Payment Issue',
+            text: 'No payment URL received.',
+            confirmButtonText: 'OK',
+          });
+        }
       },
-      error: (error) => {
-        console.error('Payment error', error);
+      error: (err) => {
+        console.error('Payment failed:', err);
         Swal.fire({
           icon: 'error',
           title: 'Payment Failed',
-          text: 'Payment processing failed. Please try again.',
+          text: err.status === 500 ? 'Server error, please try again later.' : 'Payment initiation failed. Please try again.',
           confirmButtonText: 'OK',
         });
-      }
+      },
     });
   }
 }
