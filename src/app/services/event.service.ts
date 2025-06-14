@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class EventService {
-  private baseUrl: string = 'https://3.0.89.241:8080/api';
+  private baseUrl: string = 'https://vizualabs.shop/api';
 
   constructor(private http: HttpClient) {}
 

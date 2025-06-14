@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class TicketService {
-  private baseUrl: string = 'https://3.0.89.241:8080/api/tickets/bulk';
+  private baseUrl: string = 'https://vizualabs.shop/api/tickets/bulk';
 
   constructor(private http: HttpClient) {}
 
