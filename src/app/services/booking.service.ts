@@ -34,8 +34,8 @@ export interface TicketResponse {
   providedIn: 'root'
 })
 export class BookingService {
-  private baseUrl = 'http://3.0.89.241:8080/api/tickets';
-  private transactionUrl = 'http://3.0.89.241:8080/api/transactions'; 
+  private baseUrl = 'https://3.0.89.241:8080/api/tickets';
+  private transactionUrl = 'https://3.0.89.241:8080/api/transactions'; 
   constructor(private http: HttpClient) {}
 
   bookTicket(request: TicketRequest): Observable<TicketResponse> {

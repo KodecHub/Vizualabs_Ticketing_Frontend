@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class LoginService {
-  private apiUrl = 'http://3.0.89.241:8080/api/login';
+  private apiUrl = 'https://3.0.89.241:8080/api/login';
 
   constructor(private http: HttpClient) {}
 
