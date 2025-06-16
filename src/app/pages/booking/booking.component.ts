@@ -36,7 +36,7 @@ export class BookingComponent {
       email: ['', [Validators.required, Validators.email]],
       confirmEmail: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
-      nic: ['', Validators.required]
+      nic: ['', Validators.required],
     }, { validators: this.emailMatchValidator });
   }
 
@@ -86,51 +86,49 @@ export class BookingComponent {
       return;
     }
 
+    const bookingDetails: TicketRequest = {
+      name: this.bookingForm.value.name,
+      email: this.bookingForm.value.email,
+      phoneNumber: this.bookingForm.value.phone,
+      nic: this.bookingForm.value.nic,
+      eventId: 'EV001',
+      categoryQuantities: this.selectedTicket === 'VVIP TABLE'
+        ? { [this.ticketTypeMap['VVIP']]: this.quantity * 10 }
+        : { [this.ticketTypeMap[this.selectedTicket]]: this.quantity },
+      totalAmount: this.calculateTotal()
+    };
+
     const requestPayload = {
       amount: this.calculateTotal() * 100, 
-      currency: 'LKR'
+      currency: 'LKR',
+      redirectUrl: 'https://www.wenasevents.com/booking',
+      webhook: 'https://vizualabs.shop/webhook',
     };
+
+    Swal.fire({
+      title: 'Processing Payment',  
+      text: 'Please wait while we process your payment.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
 
     this.bookingService.createTransaction(requestPayload).subscribe({
       next: (res: any) => {
         console.log('Sending Payment Request:', requestPayload);
         console.log('Payment Response:', res);
+        Swal.close();
         if (res.url) {
           console.log('Redirecting to Payment Gateway:', res.url);
-          window.location.href = res.url; 
-          const request: TicketRequest = {
-            name: this.bookingForm.value.name,
-            email: this.bookingForm.value.email,
-            phoneNumber: this.bookingForm.value.phone,
-            nic: this.bookingForm.value.nic,
-            eventId: 'EV001',
-            categoryQuantities: this.selectedTicket === 'VVIP TABLE'
-              ? { [this.ticketTypeMap['VVIP']]: this.quantity * 10 }
-              : { [this.ticketTypeMap[this.selectedTicket]]: this.quantity },
-            totalAmount: this.calculateTotal()
-          };
-          this.bookingService.bookTicket(request).subscribe({
-            next: (ticketRes) => {
-              console.log('Booking Successful:', ticketRes);
-              Swal.fire({
-                icon: 'success',
-                title: 'Booking Confirmed',
-                text: 'Your ticket has been reserved and email sent.',
-                timer: 1500,
-                showConfirmButton: false,
-              }).then(() => {
-                this.router.navigate(['/qr'], { state: { ticketResponse: ticketRes } });
-              });
-            },
-            error: (err) => {
-              console.error('Booking failed:', err);
-              Swal.fire({
-                icon: 'error',
-                title: 'Booking Failed',
-                text: 'Payment succeeded but booking failed. Please contact support.',
-                confirmButtonText: 'OK',
-              });
-            }
+          Swal.fire({
+            icon: 'info',
+            title: 'Redirecting to Payment Gateway',
+            text: 'Please complete the payment to confirm your booking. You will receive a confirmation email.',
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            window.location.href = res.url; 
           });
         } else {
           Swal.fire({
@@ -143,6 +141,7 @@ export class BookingComponent {
       },
       error: (err) => {
         console.error('Payment failed:', err);
+        Swal.close();
         Swal.fire({
           icon: 'error',
           title: 'Payment Failed',

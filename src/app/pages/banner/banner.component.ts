@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 export class BannerComponent {
   event = {
     title: 'Wenas Nights',
-    subtitle: 'BNS, Raini, Sarith Surith with News',
+    subtitle: 'BNS, Raini, Amelia, Sarith Surith with News',
     date: '2025/09/06',
     venue: 'Saffron Beach hotel, Wadduwa',
     ticketPrices: [

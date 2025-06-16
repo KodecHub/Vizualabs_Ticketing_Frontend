@@ -42,7 +42,8 @@ export class BookingService {
     return this.http.post<TicketResponse>(`${this.baseUrl}/generate`, request);
   }
 
-  createTransaction(payload: any) {
+  createTransaction(payload: any): Observable<any> {
     return this.http.post<any>(this.transactionUrl, payload);
   }
+
 }
