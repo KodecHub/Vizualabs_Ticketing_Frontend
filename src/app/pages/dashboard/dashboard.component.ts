@@ -202,7 +202,6 @@ export class DashboardComponent implements OnInit {
       ...category,
       name: this.normalizeCategoryName(category.name),
     }));
-    console.log('Synced eventForm.categories:', this.eventForm.categories);
   }
 
   // Load event data on initialization
@@ -291,8 +290,6 @@ export class DashboardComponent implements OnInit {
     ) {
       this.isGenerating = true; // Disable the button
       const normalizedCategory = this.normalizeCategoryName(this.generateForm.category);
-      console.log('generateForm.category:', normalizedCategory);
-      console.log('eventForm.categories:', this.eventForm.categories);
 
       const selectedCategory = this.eventForm.categories.find(
         (cat) => cat.name === normalizedCategory
@@ -309,7 +306,6 @@ export class DashboardComponent implements OnInit {
       const eventId = this.currentEvent.id;
       const count = this.generateForm.count;
       const category = selectedCategory.price;
-      console.log('generateBulkQR params:', { eventId, count, category });
 
       this.ticketService.generateBulkQR(eventId, count, category).subscribe({
         next: (response: Blob) => {
@@ -406,7 +402,6 @@ export class DashboardComponent implements OnInit {
             this.closeCreateEventModal();
           }
 
-          console.log('After createEvent, eventForm.categories:', this.eventForm.categories);
           this.showSuccessMessage(`Successfully created event: ${this.eventForm.name}!`);
         },
         error: (error) => {

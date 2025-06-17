@@ -10,6 +10,7 @@ export interface TicketRequest {
   eventId: string;
   categoryQuantities: { [key: number]: number };
   totalAmount: number; 
+  transactionId: any;
 }
 
 export interface TicketResponse {
@@ -36,6 +37,7 @@ export interface TicketResponse {
 export class BookingService {
   private baseUrl = 'https://vizualabs.shop/api/tickets';
   private transactionUrl = 'https://vizualabs.shop/api/transactions'; 
+  
   constructor(private http: HttpClient) {}
 
   bookTicket(request: TicketRequest): Observable<TicketResponse> {
