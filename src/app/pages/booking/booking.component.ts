@@ -36,7 +36,7 @@ export class BookingComponent {
       email: ['', [Validators.required, Validators.email]],
       confirmEmail: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
-      nic: ['', Validators.required],
+      nic: ['', Validators.required]
     }, { validators: this.emailMatchValidator });
   }
 
@@ -89,7 +89,7 @@ export class BookingComponent {
     const requestPayload = {
       amount: this.calculateTotal() * 100, 
       currency: 'LKR',
-      // redirectUrl: 'https://www.wenasevents.com/booking',
+      // redirectUrl: 'https://www.wenasevents.com/payment-success',
       webhook: 'https://vizualabs.shop/webhook',
     };
 
@@ -139,7 +139,6 @@ export class BookingComponent {
               });
             }
           });
-          console.log('Redirecting to Payment Gateway:', res.url);
           Swal.fire({
             icon: 'info',
             title: 'Redirecting to Payment Gateway',
@@ -169,6 +168,5 @@ export class BookingComponent {
         });
       },
     });
-
   }
 }
