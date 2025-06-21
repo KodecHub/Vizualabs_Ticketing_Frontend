@@ -139,6 +139,10 @@ export class BookingComponent {
                     text: 'Once your payment is successful, the ticket will be emailed to you.',
                     timer: 2000,
                     showConfirmButton: true,
+                    allowOutsideClick: false, // ✅ prevent closing on outside click
+                    allowEscapeKey: false, // ✅ prevent closing with ESC
+                    allowEnterKey: false, // (optional) prevent ENTER key from confirming
+                    showCloseButton: false, // (optional) hide 'x' button
                   }).then(() => {
                     window.location.href = res.url;
                   });
