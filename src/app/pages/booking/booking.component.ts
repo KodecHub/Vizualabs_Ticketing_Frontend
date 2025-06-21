@@ -106,7 +106,6 @@ export class BookingComponent {
       next: (res: any) => {
         Swal.close();
         if (res.url) {
-          // Prepare booking details for later use(after payment success)
           const bookingDetails: TicketRequest = {
             name: this.bookingForm.value.name,
             email: this.bookingForm.value.email,
