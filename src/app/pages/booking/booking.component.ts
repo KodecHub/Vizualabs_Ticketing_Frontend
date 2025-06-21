@@ -134,11 +134,13 @@ export class BookingComponent {
               this.bookingService.bookTicket(bookingDetails).subscribe({
                 next: (ticketRes) => {
                   Swal.fire({
-                    icon: 'success',
-                    title: 'Booking Confirmed',
-                    text: 'Your ticket has been reserved and email sent.',
-                    timer: 1000,
-                    showConfirmButton: false,
+                    icon: 'info',
+                    title: 'Booking Pending',
+                    text: 'Once your payment is successful, the ticket will be emailed to you.',
+                    timer: 2000,
+                    showConfirmButton: true,
+                  }).then(() => {
+                    window.location.href = res.url;
                   });
                 },
                 error: (err) => {
