@@ -5,6 +5,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { EventService } from '../../services/event.service';
 import { TicketService } from '../../services/ticket.service';
 import Swal from 'sweetalert2';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
+import { BarcodeFormat } from '@zxing/library';
 
 // Interfaces for type safety
 interface Event {
@@ -58,11 +60,12 @@ interface EventForm {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ZXingScannerModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
+  BarcodeFormat = BarcodeFormat;
   isGenerating = false; // Fixed syntax error
 
   // UI state
@@ -70,6 +73,11 @@ export class DashboardComponent implements OnInit {
   showGenerateModal = false;
   showCreateEventModal = false;
   ticketIdToValidate = '';
+
+  // QR Scanner state
+  isScanning = false;
+  availableDevices: MediaDeviceInfo[] = [];
+  selectedDevice?: MediaDeviceInfo;
 
   // Dependencies
   constructor(
@@ -144,6 +152,7 @@ export class DashboardComponent implements OnInit {
   // Ticket lists
   tickets: Ticket[] = [];
   validationTickets: Ticket[] = [];
+  ticketDetails: any = null;
 
   // Ticket generation form
   generateForm: GenerateForm = {
@@ -184,21 +193,25 @@ export class DashboardComponent implements OnInit {
   // Sync eventForm.categories with current event
   private syncCategories(): void {
     if (this.currentEvent.id && this.registertedEventData?.categoryLimits) {
-      this.eventForm.categories = Object.entries(this.registertedEventData.categoryLimits).map(([price, count]) => ({
+      this.eventForm.categories = Object.entries(
+        this.registertedEventData.categoryLimits
+      ).map(([price, count]) => ({
         name: this.getCategoryNameByPrice(Number(price)),
         price: Number(price),
         count: Number(count),
       }));
     } else {
       // Fallback to categoryOptions if no event data
-      this.eventForm.categories = this.categoryOptions.map(option => ({
+      this.eventForm.categories = this.categoryOptions.map((option) => ({
         name: option.value,
-        price: this.priceOptions.find(p => p.label.includes(option.value))?.value || null,
+        price:
+          this.priceOptions.find((p) => p.label.includes(option.value))
+            ?.value || null,
         count: null,
       }));
     }
     // Normalize category names
-    this.eventForm.categories = this.eventForm.categories.map(category => ({
+    this.eventForm.categories = this.eventForm.categories.map((category) => ({
       ...category,
       name: this.normalizeCategoryName(category.name),
     }));
@@ -219,7 +232,10 @@ export class DashboardComponent implements OnInit {
               0
             ),
             limits: Object.entries(data.categoryLimits)
-              .map(([price, count]) => `${this.getCategoryNameByPrice(Number(price))} (${count})`)
+              .map(
+                ([price, count]) =>
+                  `${this.getCategoryNameByPrice(Number(price))} (${count})`
+              )
               .join(', '),
           };
           this.syncCategories();
@@ -229,7 +245,8 @@ export class DashboardComponent implements OnInit {
               (sum: number, count: unknown) => sum + Number(count),
               0
             ),
-            availableTickets: this.currentEvent.totalCount - this.dashboardStats.ticketSales,
+            availableTickets:
+              this.currentEvent.totalCount - this.dashboardStats.ticketSales,
           };
           this.ticketStats = {
             sales: this.dashboardStats.ticketSales,
@@ -252,13 +269,17 @@ export class DashboardComponent implements OnInit {
   // Open ticket generation modal
   openGenerateTicketModal(): void {
     if (this.currentEvent.id === '' || this.eventForm.categories.length === 0) {
-      this.showErrorMessage('Please create an event with valid categories first.');
+      this.showErrorMessage(
+        'Please create an event with valid categories first.'
+      );
       return;
     }
     this.showGenerateModal = true;
     this.resetGenerateForm();
     // Set default category
-    const firstValidCategory = this.eventForm.categories.find(cat => cat.name && cat.price !== null);
+    const firstValidCategory = this.eventForm.categories.find(
+      (cat) => cat.name && cat.price !== null
+    );
     if (firstValidCategory) {
       this.generateForm.category = firstValidCategory.name;
     }
@@ -289,7 +310,9 @@ export class DashboardComponent implements OnInit {
       this.currentEvent.id
     ) {
       this.isGenerating = true; // Disable the button
-      const normalizedCategory = this.normalizeCategoryName(this.generateForm.category);
+      const normalizedCategory = this.normalizeCategoryName(
+        this.generateForm.category
+      );
 
       const selectedCategory = this.eventForm.categories.find(
         (cat) => cat.name === normalizedCategory
@@ -342,15 +365,18 @@ export class DashboardComponent implements OnInit {
         },
         error: (error: HttpErrorResponse) => {
           console.error('Error generating QR codes:', error);
-          const errorMessage = typeof error.error === 'object' && error.error?.message
-            ? error.error.message
-            : 'Failed to generate QR codes. Please check the backend and try again.';
+          const errorMessage =
+            typeof error.error === 'object' && error.error?.message
+              ? error.error.message
+              : 'Failed to generate QR codes. Please check the backend and try again.';
           this.showErrorMessage(errorMessage);
           this.isGenerating = false; // Re-enable button on error
         },
       });
     } else {
-      this.showErrorMessage('Please fill in all required fields for ticket generation.');
+      this.showErrorMessage(
+        'Please fill in all required fields for ticket generation.'
+      );
       this.isGenerating = false; // Ensure button is re-enabled if validation fails
     }
   }
@@ -358,11 +384,13 @@ export class DashboardComponent implements OnInit {
   // Create a new event
   createEvent(): void {
     if (this.eventForm.name && this.isEventFormValid()) {
-      const normalizedCategories = this.eventForm.categories.map(category => ({
-        name: this.normalizeCategoryName(category.name),
-        price: category.price,
-        count: category.count,
-      }));
+      const normalizedCategories = this.eventForm.categories.map(
+        (category) => ({
+          name: this.normalizeCategoryName(category.name),
+          price: category.price,
+          count: category.count,
+        })
+      );
 
       const result = {
         categoryLimits: normalizedCategories.reduce(
@@ -376,41 +404,51 @@ export class DashboardComponent implements OnInit {
         ),
       };
 
-      this.eventService.registerEvent(this.eventForm.name, 'EV001', result).subscribe({
-        next: (data: any) => {
-          this.registertedEventData = data;
-          let totalCount = 0;
-          const limits: string[] = [];
+      this.eventService
+        .registerEvent(this.eventForm.name, 'EV001', result)
+        .subscribe({
+          next: (data: any) => {
+            this.registertedEventData = data;
+            let totalCount = 0;
+            const limits: string[] = [];
 
-          normalizedCategories.forEach((category) => {
-            if (category.name && category.count && category.count > 0) {
-              totalCount += category.count;
-              limits.push(`${category.name}(${category.count})`);
+            normalizedCategories.forEach((category) => {
+              if (category.name && category.count && category.count > 0) {
+                totalCount += category.count;
+                limits.push(`${category.name}(${category.count})`);
+              }
+            });
+
+            if (totalCount > 0) {
+              this.currentEvent = {
+                name: this.registertedEventData.name,
+                id: this.registertedEventData.eventId,
+                totalCount: totalCount,
+                limits: limits.join(', '),
+              };
+              this.syncCategories();
+              this.resetStatsForNewEvent(totalCount);
+              this.clearTickets();
+              this.closeCreateEventModal();
             }
-          });
 
-          if (totalCount > 0) {
-            this.currentEvent = {
-              name: this.registertedEventData.name,
-              id: this.registertedEventData.eventId,
-              totalCount: totalCount,
-              limits: limits.join(', '),
-            };
-            this.syncCategories();
-            this.resetStatsForNewEvent(totalCount);
-            this.clearTickets();
-            this.closeCreateEventModal();
-          }
-
-          this.showSuccessMessage(`Successfully created event: ${this.eventForm.name}!`);
-        },
-        error: (error) => {
-          console.error('Error creating event:', error);
-          this.showErrorMessage('Failed to create event. Please try again.');
-        },
-      });
+            console.log(
+              'After createEvent, eventForm.categories:',
+              this.eventForm.categories
+            );
+            this.showSuccessMessage(
+              `Successfully created event: ${this.eventForm.name}!`
+            );
+          },
+          error: (error) => {
+            console.error('Error creating event:', error);
+            this.showErrorMessage('Failed to create event. Please try again.');
+          },
+        });
     } else {
-      this.showErrorMessage('Please provide a valid event name and at least one ticket category with price and count.');
+      this.showErrorMessage(
+        'Please provide a valid event name and at least one ticket category with price and count.'
+      );
     }
   }
 
@@ -448,40 +486,55 @@ export class DashboardComponent implements OnInit {
 
   // Delete the current event
   deleteEvent(): void {
-    this.confirmAction('Are you sure you want to delete this event?').then((confirmed) => {
-      if (confirmed) {
-        this.currentEvent = {
-          name: 'No Event Selected',
-          id: '',
-          totalCount: 0,
-          limits: '',
-        };
-        this.eventForm.categories = [{ name: '', price: null, count: null }];
-        this.registertedEventData = {};
-        this.resetStatsForNewEvent(0);
-        this.clearTickets();
-        this.showSuccessMessage('Event deleted successfully!');
+    this.confirmAction('Are you sure you want to delete this event?').then(
+      (confirmed) => {
+        if (confirmed) {
+          this.currentEvent = {
+            name: 'No Event Selected',
+            id: '',
+            totalCount: 0,
+            limits: '',
+          };
+          this.eventForm.categories = [{ name: '', price: null, count: null }];
+          this.registertedEventData = {};
+          this.resetStatsForNewEvent(0);
+          this.clearTickets();
+          this.showSuccessMessage('Event deleted successfully!');
+        }
       }
-    });
+    );
   }
 
   // Placeholder for edit event
   editEvent(): void {
-    this.showInfoMessage('Edit event functionality would open an edit modal here.');
+    this.showInfoMessage(
+      'Edit event functionality would open an edit modal here.'
+    );
   }
 
   // Validate a ticket by ID
   validateTicket(): void {
-    if (this.ticketIdToValidate.trim()) {
-      const found = this.tickets.find(
-        (ticket) => ticket.id.toLowerCase() === this.ticketIdToValidate.toLowerCase().trim()
-      );
-      if (found) {
-        this.showSuccessMessage(`Ticket ${this.ticketIdToValidate} is valid!`);
-      } else {
-        this.showErrorMessage(`Ticket ${this.ticketIdToValidate} not found!`);
-      }
-      this.ticketIdToValidate = '';
+    const ticketId = this.ticketIdToValidate.trim().replace(/^"|"$/g, '');
+    if (ticketId) {
+      this.ticketService.getTicketById(ticketId).subscribe({
+        next: (data: any) => {
+          this.ticketDetails = data;
+          this.showSuccessMessage(
+            `Ticket ID: ${ticketId} is valid!\n` +
+              `Category: ${data.category}\n` +
+              `Quantity: ${data.quantity}\n`
+          );
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Error validating ticket:', error);
+          const errorMessage =
+            typeof error.error === 'object' && error.error?.message
+              ? error.error.message
+              : 'Ticket validation failed. Please check the ticket ID.';
+          this.showErrorMessage(errorMessage);
+          this.ticketDetails = null;
+        },
+      });
     }
   }
 
@@ -508,13 +561,17 @@ export class DashboardComponent implements OnInit {
   deleteSelectedTickets(): void {
     const selectedCount = this.getSelectedTicketsCount();
     if (selectedCount > 0) {
-      this.confirmAction(`Delete ${selectedCount} selected tickets?`).then((confirmed) => {
-        if (confirmed) {
-          this.tickets = this.tickets.filter((ticket) => !ticket.selected);
-          this.updateValidationTickets();
-          this.showSuccessMessage(`${selectedCount} tickets deleted successfully!`);
+      this.confirmAction(`Delete ${selectedCount} selected tickets?`).then(
+        (confirmed) => {
+          if (confirmed) {
+            this.tickets = this.tickets.filter((ticket) => !ticket.selected);
+            this.updateValidationTickets();
+            this.showSuccessMessage(
+              `${selectedCount} tickets deleted successfully!`
+            );
+          }
         }
-      });
+      );
     }
   }
 
@@ -542,8 +599,14 @@ export class DashboardComponent implements OnInit {
   private updateStats(count: number): void {
     this.ticketStats.sales += count;
     this.dashboardStats.ticketSales += count;
-    this.ticketStats.available = Math.max(0, this.ticketStats.available - count);
-    this.dashboardStats.availableTickets = Math.max(0, this.dashboardStats.availableTickets - count);
+    this.ticketStats.available = Math.max(
+      0,
+      this.ticketStats.available - count
+    );
+    this.dashboardStats.availableTickets = Math.max(
+      0,
+      this.dashboardStats.availableTickets - count
+    );
   }
 
   private resetStatsForNewEvent(totalCount: number): void {
@@ -573,13 +636,49 @@ export class DashboardComponent implements OnInit {
     this.validationStats.participants = this.tickets.length;
   }
 
+  // --- QR Scanner Methods ---
+
+  toggleScanner(): void {
+    if (this.isScanning) {
+      this.stopScanner();
+    } else {
+      this.startScanner();
+    }
+  }
+
+  startScanner(): void {
+    this.isScanning = true;
+  }
+
+  stopScanner(): void {
+    this.isScanning = false;
+  }
+
+  onCamerasFound(devices: MediaDeviceInfo[]): void {
+    this.availableDevices = devices;
+    // Select rear camera if available
+    const rearCamera = devices.find((device) =>
+      /back|rear|environment/gi.test(device.label)
+    );
+    this.selectedDevice = rearCamera || devices[0];
+  }
+
+  onCodeResult(resultString: string): void {
+    if (resultString) {
+      // Remove leading/trailing quotes if present
+      this.ticketIdToValidate = resultString.replace(/^"|"$/g, '');
+      this.validateTicket(); // This will handle validation and fetching details
+      this.stopScanner();
+    }
+  }
+
   private async showSuccessMessage(message: string): Promise<void> {
     await Swal.fire({
       icon: 'success',
       title: 'Success',
       text: message,
-      timer: 1500,
-      showConfirmButton: false,
+      showConfirmButton: true,
+      confirmButtonText: 'Close',
     });
   }
 
@@ -613,5 +712,3 @@ export class DashboardComponent implements OnInit {
     return result.isConfirmed;
   }
 }
-
-

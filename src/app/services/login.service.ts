@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class LoginService {
-  private apiUrl = 'https://vizualabs.shop/api/login'; 
+  private apiUrl = 'http://localhost:8080/api/login'; 
 
   constructor(private http: HttpClient) {}
 

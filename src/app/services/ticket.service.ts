@@ -4,10 +4,10 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TicketService {
-  private baseUrl: string = 'https://vizualabs.shop/api/tickets/bulk';
+  private baseUrl: string = 'http://localhost:8080/api/tickets';
 
   constructor(private http: HttpClient) {}
 
@@ -16,7 +16,7 @@ export class TicketService {
     count: number,
     category: number
   ): Observable<Blob> {
-    const url = `${this.baseUrl}/${eventId}/${count}/${category}`;
+    const url = `${this.baseUrl}/bulk/${eventId}/${count}/${category}`;
     return this.http.post(url, null, { responseType: 'blob' }).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.error instanceof Blob) {
@@ -25,11 +25,13 @@ export class TicketService {
             reader.onload = () => {
               try {
                 const errorJson = JSON.parse(reader.result as string);
-                observer.error(new HttpErrorResponse({
-                  error: errorJson,
-                  status: error.status,
-                  statusText: error.statusText
-                }));
+                observer.error(
+                  new HttpErrorResponse({
+                    error: errorJson,
+                    status: error.status,
+                    statusText: error.statusText,
+                  })
+                );
               } catch (e) {
                 observer.error(error);
               }
@@ -41,5 +43,13 @@ export class TicketService {
         return throwError(() => error);
       })
     );
+  }
+
+  getTicketDetails(ticketId: string) {
+    return this.http.get<any>(`${this.baseUrl}/${encodeURIComponent(ticketId)}`);
+  }
+
+  getTicketById(ticketId: string) {
+    return this.http.get<any>(`${this.baseUrl}/${encodeURIComponent(ticketId)}`);
   }
 }

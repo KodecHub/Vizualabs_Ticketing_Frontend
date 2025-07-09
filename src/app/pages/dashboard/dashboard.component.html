@@ -13,19 +13,40 @@
 
 <!-- Navigation with PNG Icons -->
 <nav class="navigation">
-  <div class="nav-item" [class.active]="activeTab === 'dashboard'" (click)="setActiveTab('dashboard')" role="button"
-    tabindex="0" (keydown.enter)="setActiveTab('dashboard')" (keydown.space)="setActiveTab('dashboard')">
-    <img [src]="icons.dashboard" alt="Dashboard" class="nav-icon-img">
+  <div
+    class="nav-item"
+    [class.active]="activeTab === 'dashboard'"
+    (click)="setActiveTab('dashboard')"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="setActiveTab('dashboard')"
+    (keydown.space)="setActiveTab('dashboard')"
+  >
+    <img [src]="icons.dashboard" alt="Dashboard" class="nav-icon-img" />
     Dashboard
   </div>
-  <div class="nav-item" [class.active]="activeTab === 'tickets'" (click)="setActiveTab('tickets')" role="button"
-    tabindex="0" (keydown.enter)="setActiveTab('tickets')" (keydown.space)="setActiveTab('tickets')">
-    <img [src]="icons.tickets" alt="Tickets" class="nav-icon-img">
+  <div
+    class="nav-item"
+    [class.active]="activeTab === 'tickets'"
+    (click)="setActiveTab('tickets')"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="setActiveTab('tickets')"
+    (keydown.space)="setActiveTab('tickets')"
+  >
+    <img [src]="icons.tickets" alt="Tickets" class="nav-icon-img" />
     Tickets
   </div>
-  <div class="nav-item" [class.active]="activeTab === 'validation'" (click)="setActiveTab('validation')" role="button"
-    tabindex="0" (keydown.enter)="setActiveTab('validation')" (keydown.space)="setActiveTab('validation')">
-    <img [src]="icons.validation" alt="Validation" class="nav-icon-img">
+  <div
+    class="nav-item"
+    [class.active]="activeTab === 'validation'"
+    (click)="setActiveTab('validation')"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="setActiveTab('validation')"
+    (keydown.space)="setActiveTab('validation')"
+  >
+    <img [src]="icons.validation" alt="Validation" class="nav-icon-img" />
     Validation
   </div>
 </nav>
@@ -33,7 +54,12 @@
 <!-- Dashboard Content -->
 <main class="main-content">
   <!-- Dashboard Tab -->
-  <div *ngIf="activeTab === 'dashboard'" class="tab-content" role="tabpanel" aria-labelledby="dashboard-tab">
+  <div
+    *ngIf="activeTab === 'dashboard'"
+    class="tab-content"
+    role="tabpanel"
+    aria-labelledby="dashboard-tab"
+  >
     <!-- Event Card -->
     <div class="event-card" *ngIf="currentEvent.name !== 'No Event Selected'">
       <div class="event-header">
@@ -44,19 +70,23 @@
           <p class="limits">Limits: {{ currentEvent.limits }}</p>
         </div>
         <div class="event-actions">
-          <button class="action-btn delete-btn" 
-                  (click)="deleteEvent()" 
-                  type="button" 
-                  title="Delete Event"
-                  aria-label="Delete Event">
-            <img [src]="icons.delete" alt="Delete" class="action-icon-img">
+          <button
+            class="action-btn delete-btn"
+            (click)="deleteEvent()"
+            type="button"
+            title="Delete Event"
+            aria-label="Delete Event"
+          >
+            <img [src]="icons.delete" alt="Delete" class="action-icon-img" />
           </button>
-          <button class="action-btn edit-btn" 
-                  (click)="editEvent()" 
-                  type="button"
-                  title="Edit Event"
-                  aria-label="Edit Event">
-            <img [src]="icons.edit" alt="Edit" class="action-icon-img">
+          <button
+            class="action-btn edit-btn"
+            (click)="editEvent()"
+            type="button"
+            title="Edit Event"
+            aria-label="Edit Event"
+          >
+            <img [src]="icons.edit" alt="Edit" class="action-icon-img" />
           </button>
         </div>
       </div>
@@ -92,7 +122,12 @@
   </div>
 
   <!-- Tickets Tab -->
-  <div *ngIf="activeTab === 'tickets'" class="tab-content" role="tabpanel" aria-labelledby="tickets-tab">
+  <div
+    *ngIf="activeTab === 'tickets'"
+    class="tab-content"
+    role="tabpanel"
+    aria-labelledby="tickets-tab"
+  >
     <!-- Ticket Stats -->
     <div class="ticket-stats">
       <div class="stat-card">
@@ -107,8 +142,12 @@
         </div>
         <span class="stat-number">{{ ticketStats.available }}</span>
       </div>
-      <button class="btn-primary generate-btn" (click)="openGenerateTicketModal()" type="button"
-        [disabled]="currentEvent.name === 'No Event Selected'">
+      <button
+        class="btn-primary generate-btn"
+        (click)="openGenerateTicketModal()"
+        type="button"
+        [disabled]="currentEvent.name === 'No Event Selected'"
+      >
         Generate Ticket
       </button>
     </div>
@@ -120,7 +159,7 @@
           <tr>
             <th scope="col">Ticket Id</th>
             <th scope="col">Event</th>
-            <th scope="col">name</th>
+            <th scope="col">Name</th>
             <th scope="col">Category</th>
             <th scope="col">Status</th>
             <th scope="col">Action</th>
@@ -134,7 +173,11 @@
             <td>{{ ticket.category }}</td>
             <td>{{ ticket.status }}</td>
             <td>
-              <input type="checkbox" [(ngModel)]="ticket.selected" [attr.aria-label]="'Select ticket ' + ticket.id">
+              <input
+                type="checkbox"
+                [(ngModel)]="ticket.selected"
+                [attr.aria-label]="'Select ticket ' + ticket.id"
+              />
             </td>
           </tr>
         </tbody>
@@ -143,7 +186,12 @@
 
     <ng-template #noTickets>
       <div class="no-data">
-        <img [src]="icons.tickets" alt="No Tickets" class="large-icon-img" *ngIf="icons.tickets">
+        <img
+          [src]="icons.tickets"
+          alt="No Tickets"
+          class="large-icon-img"
+          *ngIf="icons.tickets"
+        />
         <h3>No Tickets Found</h3>
         <p>Generate tickets to see them here</p>
       </div>
@@ -151,7 +199,12 @@
   </div>
 
   <!-- Validation Tab -->
-  <div *ngIf="activeTab === 'validation'" class="tab-content" role="tabpanel" aria-labelledby="validation-tab">
+  <div
+    *ngIf="activeTab === 'validation'"
+    class="tab-content"
+    role="tabpanel"
+    aria-labelledby="validation-tab"
+  >
     <!-- Validation Stats -->
     <div class="validation-stats">
       <div class="stat-card">
@@ -167,10 +220,13 @@
         <span class="stat-number">{{ validationStats.participants }}</span>
       </div>
       <div class="validation-controls">
-        <button class="btn-outline" type="button">
-          All
-        </button>
-        <button class="btn-primary" (click)="validateTicket()" type="button" [disabled]="!ticketIdToValidate.trim()">
+        <button class="btn-outline" type="button">All</button>
+        <button
+          class="btn-primary"
+          (click)="validateTicket()"
+          type="button"
+          [disabled]="!ticketIdToValidate.trim()"
+        >
           Check
         </button>
       </div>
@@ -179,33 +235,69 @@
     <!-- Ticket ID Input -->
     <div class="ticket-id-input">
       <div class="input-with-icon">
-        <input type="text" id="ticketIdInput" placeholder="Ticket Id" [(ngModel)]="ticketIdToValidate"
-          class="input-field" [class.with-icon]="icons.search" (keydown.enter)="validateTicket()">
+        <input
+          type="text"
+          id="ticketIdInput"
+          placeholder="Ticket Id"
+          [(ngModel)]="ticketIdToValidate"
+          class="input-field"
+          [class.with-icon]="icons.search"
+          (keydown.enter)="validateTicket()"
+        />
       </div>
     </div>
 
+    <!-- QR Scanner Controls -->
+    <div class="qr-scanner-controls">
+      <button class="btn-outline" (click)="toggleScanner()">
+        {{ isScanning ? "Stop Scanner" : "Start Scanner" }}
+      </button>
+    </div>
+
+    <!-- QR Scanner -->
+    <div class="qr-scanner" *ngIf="isScanning">
+      <zxing-scanner
+        [device]="selectedDevice"
+        [formats]="[BarcodeFormat.QR_CODE]"
+        [torch]="false"
+        [tryHarder]="true"
+        (camerasFound)="onCamerasFound($event)"
+        (scanSuccess)="onCodeResult($event)"
+      >
+      </zxing-scanner>
+    </div>
+
     <!-- Validation Table -->
-    <div class="table-container" *ngIf="validationTickets.length > 0; else noValidationTickets">
+    <div
+      class="table-container"
+      *ngIf="validationTickets.length > 0; else noValidationTickets"
+    >
       <table class="data-table" role="table">
         <thead>
           <tr>
             <th scope="col">Ticket Id</th>
             <th scope="col">Event</th>
-            <th scope="col">name</th>
+            <th scope="col">Name</th>
             <th scope="col">Category</th>
             <th scope="col">Status</th>
             <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let ticket of validationTickets; trackBy: trackByTicketId">
+          <tr
+            *ngFor="let ticket of validationTickets; trackBy: trackByTicketId"
+          >
             <td>{{ ticket.id }}</td>
             <td>{{ ticket.event }}</td>
             <td>{{ ticket.name }}</td>
             <td>{{ ticket.category }}</td>
             <td>{{ ticket.status }}</td>
             <td>
-              <input type="checkbox" [(ngModel)]="ticket.selected" [attr.aria-label]="'Select ticket ' + ticket.id">
+              <input
+                type="checkbox"
+                [(ngModel)]="ticket.selected"
+                [attr.aria-label]="'Select ticket ' + ticket.id"
+              />
             </td>
           </tr>
         </tbody>
@@ -214,7 +306,12 @@
 
     <ng-template #noValidationTickets>
       <div class="no-data">
-        <img [src]="icons.validation" alt="No Validation" class="large-icon-img" *ngIf="icons.validation">
+        <img
+          [src]="icons.validation"
+          alt="No Validation"
+          class="large-icon-img"
+          *ngIf="icons.validation"
+        />
         <h3>No Tickets to Validate</h3>
         <p>Generate tickets first to validate them</p>
       </div>
@@ -223,16 +320,33 @@
 </main>
 
 <!-- Generate Ticket Modal -->
-<div *ngIf="showGenerateModal" class="modal-overlay" (click)="onModalOverlayClick($event)" role="dialog"
-  aria-modal="true" aria-labelledby="generate-modal-title">
+<div
+  *ngIf="showGenerateModal"
+  class="modal-overlay"
+  (click)="onModalOverlayClick($event)"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="generate-modal-title"
+>
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <img [src]="icons.tickets" alt="Generate" class="modal-icon-img" *ngIf="icons.tickets">
+      <img
+        [src]="icons.tickets"
+        alt="Generate"
+        class="modal-icon-img"
+        *ngIf="icons.tickets"
+      />
       <h2 id="generate-modal-title">Generate Tickets</h2>
     </div>
     <form (ngSubmit)="generateTickets()" #generateTicketForm="ngForm">
       <div class="form-group">
-        <select [(ngModel)]="generateForm.category" name="category" id="categorySelect" class="input-field" required>
+        <select
+          [(ngModel)]="generateForm.category"
+          name="category"
+          id="categorySelect"
+          class="input-field"
+          required
+        >
           <option value="">Select category</option>
           <option value="VVIP">VVIP</option>
           <option value="VIP">VIP</option>
@@ -240,12 +354,26 @@
         </select>
       </div>
       <div class="form-group">
-        <input type="number" [(ngModel)]="generateForm.count" name="count" id="countInput" placeholder="Count"
-          class="input-field" min="1" max="1000" required>
+        <input
+          type="number"
+          [(ngModel)]="generateForm.count"
+          name="count"
+          id="countInput"
+          placeholder="Count"
+          class="input-field"
+          min="1"
+          max="1000"
+          required
+        />
       </div>
       <div class="modal-actions">
-        <button id="generate-tickets-button" class="btn-primary generate-btn" [disabled]="isGenerating || !generateTicketForm.form.valid" type="submit">
-          {{ isGenerating ? 'Generating...' : 'Generate Tickets' }}
+        <button
+          id="generate-tickets-button"
+          class="btn-primary generate-btn"
+          [disabled]="isGenerating || !generateTicketForm.form.valid"
+          type="submit"
+        >
+          {{ isGenerating ? "Generating..." : "Generate Tickets" }}
         </button>
       </div>
     </form>
@@ -253,52 +381,111 @@
 </div>
 
 <!-- Create Event Modal -->
-<div *ngIf="showCreateEventModal" class="modal-overlay" (click)="onModalOverlayClick($event)" role="dialog"
-  aria-modal="true" aria-labelledby="create-event-modal-title">
+<div
+  *ngIf="showCreateEventModal"
+  class="modal-overlay"
+  (click)="onModalOverlayClick($event)"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="create-event-modal-title"
+>
   <div class="modal create-event-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <img [src]="icons.add" alt="Create" class="modal-icon-img" *ngIf="icons.add">
+      <img
+        [src]="icons.add"
+        alt="Create"
+        class="modal-icon-img"
+        *ngIf="icons.add"
+      />
       <h2 id="create-event-modal-title">Create New Event</h2>
     </div>
     <form (ngSubmit)="createEvent()" #createEventForm="ngForm">
       <div class="form-group">
         <label for="eventNameInput">Event Name</label>
-        <input type="text" [(ngModel)]="eventForm.name" name="eventName" id="eventNameInput" placeholder="Enter Name"
-          class="input-field" required maxlength="100">
+        <input
+          type="text"
+          [(ngModel)]="eventForm.name"
+          name="eventName"
+          id="eventNameInput"
+          placeholder="Enter Name"
+          class="input-field"
+          required
+          maxlength="100"
+        />
       </div>
 
       <div class="tickets-section">
         <h3>
-          <img [src]="icons.tickets" alt="Tickets" class="section-icon-img" *ngIf="icons.tickets">
+          <img
+            [src]="icons.tickets"
+            alt="Tickets"
+            class="section-icon-img"
+            *ngIf="icons.tickets"
+          />
           Tickets
         </h3>
-        <div class="ticket-category" *ngFor="let category of eventForm.categories; let i = index">
+        <div
+          class="ticket-category"
+          *ngFor="let category of eventForm.categories; let i = index"
+        >
           <div class="category-row">
-            <select [(ngModel)]="category.name" [name]="'categoryName' + i" class="input-field" required>
+            <select
+              [(ngModel)]="category.name"
+              [name]="'categoryName' + i"
+              class="input-field"
+              required
+            >
               <option value="">Select Category</option>
               <option value="VVIP_TABLE">VVIP TABLE</option>
               <option value="VVIP">VVIP</option>
               <option value="VIP">VIP</option>
               <option value="General">GENERAL</option>
             </select>
-            <select [(ngModel)]="category.price" [name]="'categoryPrice' + i" class="input-field" required>
+            <select
+              [(ngModel)]="category.price"
+              [name]="'categoryPrice' + i"
+              class="input-field"
+              required
+            >
               <option value="">Select Price</option>
               <option [value]="75000">LKR 75,000</option>
               <option [value]="7500">LKR 7,500</option>
               <option [value]="5000">LKR 5,000</option>
               <option [value]="3500">LKR 3,500</option>
             </select>
-            <input type="number" [(ngModel)]="category.count" [name]="'categoryCount' + i" placeholder="Count"
-              class="input-field count-input" min="1" max="10000">
-            <button type="button" class="btn-remove" (click)="removeCategory(i)" *ngIf="eventForm.categories.length > 1"
-              title="Remove Category">
-              <img [src]="icons.delete" alt="Remove" class="remove-icon-img" *ngIf="icons.delete">
+            <input
+              type="number"
+              [(ngModel)]="category.count"
+              [name]="'categoryCount' + i"
+              placeholder="Count"
+              class="input-field count-input"
+              min="1"
+              max="10000"
+            />
+            <button
+              type="button"
+              class="btn-remove"
+              (click)="removeCategory(i)"
+              *ngIf="eventForm.categories.length > 1"
+              title="Remove Category"
+            >
+              <img
+                [src]="icons.delete"
+                alt="Remove"
+                class="remove-icon-img"
+                *ngIf="icons.delete"
+              />
               <span *ngIf="!icons.delete">×</span>
             </button>
           </div>
         </div>
         <button type="button" class="btn-add-category" (click)="addCategory()">
-          <img [src]="icons.add" alt="Add" class="add-icon-img" *ngIf="icons.add">
+          <img
+            [src]="icons.add"
+            alt="Add"
+            class="add-icon-img"
+            *ngIf="icons.add"
+          />
           <span *ngIf="!icons.add">+</span>
           Add Category
         </button>
@@ -306,11 +493,24 @@
 
       <!-- Submit Buttons -->
       <div class="modal-actions">
-        <button type="button" class="btn-outline" (click)="closeCreateEventModal()">
+        <button
+          type="button"
+          class="btn-outline"
+          (click)="closeCreateEventModal()"
+        >
           Cancel
         </button>
-        <button type="submit" class="btn-primary" [disabled]="!createEventForm.form.valid || !isEventFormValid()">
-          <img [src]="icons.add" alt="Create" class="btn-icon" *ngIf="icons.add">
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="!createEventForm.form.valid || !isEventFormValid()"
+        >
+          <img
+            [src]="icons.add"
+            alt="Create"
+            class="btn-icon"
+            *ngIf="icons.add"
+          />
           <span *ngIf="!icons.add">+</span>
           Create Event
         </button>
