@@ -114,9 +114,9 @@
       </div>
       <div class="stat-card">
         <div class="stat-header">
-          <h3>Available tickets</h3>
+          <h3>Total Tickets Created</h3>
         </div>
-        <p class="stat-value">{{ dashboardStats.availableTickets }}</p>
+        <p class="stat-value">{{ currentEvent.totalCount }}</p>
       </div>
     </div>
   </div>
@@ -138,9 +138,9 @@
       </div>
       <div class="stat-card">
         <div class="stat-header">
-          <h3>Available tickets</h3>
+          <h3>Total Tickets Created</h3>
         </div>
-        <span class="stat-number">{{ ticketStats.available }}</span>
+        <span class="stat-number">{{ currentEvent.totalCount }}</span>
       </div>
       <button
         class="btn-primary generate-btn"
@@ -223,7 +223,7 @@
         <button class="btn-outline" type="button">All</button>
         <button
           class="btn-primary"
-          (click)="validateTicket()"
+          (click)="validateTicket(ticketIdToValidate)"
           type="button"
           [disabled]="!ticketIdToValidate.trim()"
         >
@@ -242,7 +242,7 @@
           [(ngModel)]="ticketIdToValidate"
           class="input-field"
           [class.with-icon]="icons.search"
-          (keydown.enter)="validateTicket()"
+          (keydown.enter)="validateTicket(ticketIdToValidate)"
         />
       </div>
     </div>

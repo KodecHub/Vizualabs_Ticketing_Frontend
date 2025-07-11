@@ -46,10 +46,23 @@ export class TicketService {
   }
 
   getTicketDetails(ticketId: string) {
-    return this.http.get<any>(`${this.baseUrl}/${encodeURIComponent(ticketId)}`);
+    return this.http.get<any>(
+      `${this.baseUrl}/${encodeURIComponent(ticketId)}`
+    );
   }
 
   getTicketById(ticketId: string) {
-    return this.http.get<any>(`${this.baseUrl}/${encodeURIComponent(ticketId)}`);
+    return this.http.get<any>(
+      `${this.baseUrl}/${encodeURIComponent(ticketId)}`
+    );
+  }
+
+  validateAndUseTicket(ticketId: string, validateQuantity: number = 1) {
+    return this.http.post<any>(
+      `${this.baseUrl}/validate?ticketId=${encodeURIComponent(
+        ticketId
+      )}&validateQuantity=${validateQuantity}`,
+      {}
+    );
   }
 }

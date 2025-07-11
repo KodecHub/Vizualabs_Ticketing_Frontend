@@ -39,6 +39,7 @@ interface Ticket {
   category: string;
   status: string;
   selected: boolean;
+  quantity?: number;
 }
 
 interface GenerateForm {
@@ -350,12 +351,14 @@ export class DashboardComponent implements OnInit {
               category: normalizedCategory,
               status: 'Active',
               selected: false,
+              quantity: 1, // Set quantity to 1 for generated tickets
             });
           }
 
           this.tickets = [...this.tickets, ...newTickets];
           this.updateStats(count);
           this.updateValidationTickets();
+          this.updateStatsAfterChange();
           this.closeGenerateModal();
 
           this.showSuccessMessage(
@@ -513,26 +516,54 @@ export class DashboardComponent implements OnInit {
   }
 
   // Validate a ticket by ID
-  validateTicket(): void {
-    const ticketId = this.ticketIdToValidate.trim().replace(/^"|"$/g, '');
+  validateTicket(ticketId: string): void {
     if (ticketId) {
-      this.ticketService.getTicketById(ticketId).subscribe({
-        next: (data: any) => {
-          this.ticketDetails = data;
-          this.showSuccessMessage(
-            `Ticket ID: ${ticketId} is valid!\n` +
-              `Category: ${data.category}\n` +
-              `Quantity: ${data.quantity}\n`
-          );
+      this.ticketService.validateAndUseTicket(ticketId).subscribe({
+        next: (response: any) => {
+          if (response.valid) {
+            // Fetch ticket details
+            this.ticketService.getTicketById(ticketId).subscribe({
+              next: (ticketDetails: any) => {
+                // Check if ticket is already in the list
+                const existingIndex = this.validationTickets.findIndex(
+                  (t) => t.id === ticketId
+                );
+                const ticketObj = {
+                  id: response.ticketId,
+                  event: ticketDetails.eventId,
+                  name: ticketDetails.name,
+                  category: ticketDetails.category,
+                  status: response.status,
+                  selected: false,
+                  quantity: ticketDetails.quantity, // <-- Make sure this is set!
+                };
+                if (existingIndex === -1) {
+                  this.validationTickets.push(ticketObj);
+                } else {
+                  // Update status if already present
+                  this.validationTickets[existingIndex].status =
+                    response.status;
+                }
+                this.updateStatsAfterChange(); // <-- Use this
+                this.showSuccessMessage(
+                  `Ticket ID: ${response.ticketId} is valid!\nRemaining Quantity: ${response.remainingQuantity}`
+                );
+              },
+              error: () => {
+                this.showErrorMessage('Could not fetch ticket details.');
+              },
+            });
+          } else {
+            this.showErrorMessage(
+              response.message ||
+                `Ticket ${ticketId} is invalid or already used!`
+            );
+          }
         },
-        error: (error: HttpErrorResponse) => {
-          console.error('Error validating ticket:', error);
-          const errorMessage =
-            typeof error.error === 'object' && error.error?.message
-              ? error.error.message
-              : 'Ticket validation failed. Please check the ticket ID.';
-          this.showErrorMessage(errorMessage);
-          this.ticketDetails = null;
+        error: (error: any) => {
+          this.showErrorMessage(
+            `Error validating ticket: ${error.message || 'Unknown error'}`
+          );
         },
       });
     }
@@ -631,9 +662,29 @@ export class DashboardComponent implements OnInit {
   }
 
   private updateValidationTickets(): void {
-    this.validationTickets = this.tickets.slice(0, 4);
-    this.validationStats.activeTickets = this.tickets.length;
-    this.validationStats.participants = this.tickets.length;
+    const totalSold = this.tickets.reduce(
+      (sum, t) => sum + (t.quantity || 1),
+      0
+    );
+    const totalValidated = this.validationTickets.reduce(
+      (sum, t) => sum + (t.quantity || 1),
+      0
+    );
+    this.validationStats.activeTickets = totalSold - totalValidated;
+    this.validationStats.participants = totalValidated;
+  }
+
+  updateStatsAfterChange() {
+    const totalSold = this.tickets.reduce(
+      (sum, t) => sum + (t.quantity || 1),
+      0
+    );
+    const totalValidated = this.validationTickets.reduce(
+      (sum, t) => sum + (t.quantity || 1),
+      0
+    );
+    this.validationStats.activeTickets = totalSold - totalValidated;
+    this.validationStats.participants = totalValidated;
   }
 
   // --- QR Scanner Methods ---
@@ -664,12 +715,33 @@ export class DashboardComponent implements OnInit {
   }
 
   onCodeResult(resultString: string): void {
-    if (resultString) {
-      // Remove leading/trailing quotes if present
-      this.ticketIdToValidate = resultString.replace(/^"|"$/g, '');
-      this.validateTicket(); // This will handle validation and fetching details
-      this.stopScanner();
+    let ticketIds: string[] = [];
+
+    try {
+      // Try to parse as JSON array
+      const parsed = JSON.parse(resultString);
+      if (Array.isArray(parsed)) {
+        ticketIds = parsed;
+      } else if (typeof parsed === 'string') {
+        ticketIds = [parsed];
+      } else if (parsed.ticketId) {
+        ticketIds = [parsed.ticketId];
+      }
+    } catch (e) {
+      // Not JSON, try delimited
+      if (resultString.includes('|')) {
+        ticketIds = resultString.split('|');
+      } else {
+        ticketIds = [resultString.replace(/^"|"$/g, '')];
+      }
     }
+
+    // Validate each ticket ID
+    ticketIds.forEach((ticketId) => {
+      this.validateTicket(ticketId.trim());
+    });
+
+    this.stopScanner();
   }
 
   private async showSuccessMessage(message: string): Promise<void> {
@@ -710,5 +782,20 @@ export class DashboardComponent implements OnInit {
       cancelButtonText: 'No',
     });
     return result.isConfirmed;
+  }
+
+  // Add this method to be called after booking a ticket (from booking response)
+  addBookedTicketToDashboard(response: any) {
+    const newTicket = {
+      id: response.ticketId,
+      event: response.eventId,
+      name: response.name,
+      category: response.category,
+      status: response.status,
+      selected: false,
+      quantity: response.quantity,
+    };
+    this.tickets.push(newTicket);
+    this.updateStatsAfterChange(); // <-- Use this
   }
 }
