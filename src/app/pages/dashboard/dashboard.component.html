@@ -247,24 +247,30 @@
       </div>
     </div>
 
-    <!-- QR Scanner Controls -->
-    <div class="qr-scanner-controls">
-      <button class="btn-outline" (click)="toggleScanner()">
-        {{ isScanning ? "Stop Scanner" : "Start Scanner" }}
-      </button>
-    </div>
+    <!-- Start Scanner Button (visible when scanner is closed) -->
+    <button class="btn-outline" *ngIf="!isScanning" (click)="toggleScanner()">
+      Start Scanner
+    </button>
 
-    <!-- QR Scanner -->
-    <div class="qr-scanner" *ngIf="isScanning">
-      <zxing-scanner
-        [device]="selectedDevice"
-        [formats]="[BarcodeFormat.QR_CODE]"
-        [torch]="false"
-        [tryHarder]="true"
-        (camerasFound)="onCamerasFound($event)"
-        (scanSuccess)="onCodeResult($event)"
-      >
-      </zxing-scanner>
+    <!-- QR Scanner Wrapper (visible only when scanning) -->
+    <div class="qr-scanner-wrapper" *ngIf="isScanning">
+      <div class="qr-scanner-header">
+        <img src="dslr-camera.png" alt="Camera" class="qr-camera-icon" />
+        <span>Scan your ticket QR code</span>
+      </div>
+      <div class="qr-scanner-area">
+        <zxing-scanner
+          [device]="selectedDevice"
+          [formats]="[BarcodeFormat.QR_CODE]"
+          [torch]="false"
+          [tryHarder]="true"
+          (camerasFound)="onCamerasFound($event)"
+          (scanSuccess)="onCodeResult($event)"
+        ></zxing-scanner>
+      </div>
+      <button class="btn-outline qr-close-btn" (click)="toggleScanner()">
+        Close Scanner
+      </button>
     </div>
 
     <!-- Validation Table -->

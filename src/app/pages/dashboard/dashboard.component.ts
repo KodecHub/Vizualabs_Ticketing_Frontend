@@ -40,6 +40,7 @@ interface Ticket {
   status: string;
   selected: boolean;
   quantity?: number;
+  seatRange?: string;
 }
 
 interface GenerateForm {
@@ -535,19 +536,26 @@ export class DashboardComponent implements OnInit {
                   category: ticketDetails.category,
                   status: response.status,
                   selected: false,
-                  quantity: ticketDetails.quantity, // <-- Make sure this is set!
+                  quantity: ticketDetails.quantity,
+                  seatRange: response.seatRange, // Add seat range from validation response
                 };
                 if (existingIndex === -1) {
                   this.validationTickets.push(ticketObj);
                 } else {
-                  // Update status if already present
+                  // Update status and seat range if already present
                   this.validationTickets[existingIndex].status =
                     response.status;
+                  this.validationTickets[existingIndex].seatRange =
+                    response.seatRange;
                 }
-                this.updateStatsAfterChange(); // <-- Use this
-                this.showSuccessMessage(
-                  `Ticket ID: ${response.ticketId} is valid!\nRemaining Quantity: ${response.remainingQuantity}`
-                );
+                this.updateStatsAfterChange();
+
+                // Show success message with seat range if available
+                let successMessage = `Ticket ID: ${response.ticketId} is valid!\nRemaining Quantity: ${response.remainingQuantity}`;
+                if (response.seatRange) {
+                  successMessage += `\nSeat Range: ${response.seatRange}`;
+                }
+                this.showSuccessMessage(successMessage);
               },
               error: () => {
                 this.showErrorMessage('Could not fetch ticket details.');
@@ -740,15 +748,14 @@ export class DashboardComponent implements OnInit {
     ticketIds.forEach((ticketId) => {
       this.validateTicket(ticketId.trim());
     });
-
-    this.stopScanner();
+    this.stopScanner(); 
   }
 
   private async showSuccessMessage(message: string): Promise<void> {
     await Swal.fire({
       icon: 'success',
       title: 'Success',
-      text: message,
+      html: message.replace(/\n/g, '<br>'), // Use html and convert newlines to <br>
       showConfirmButton: true,
       confirmButtonText: 'Close',
     });
@@ -794,8 +801,9 @@ export class DashboardComponent implements OnInit {
       status: response.status,
       selected: false,
       quantity: response.quantity,
+      seatRange: response.seatRange, // Add seat range from booking response
     };
     this.tickets.push(newTicket);
-    this.updateStatsAfterChange(); // <-- Use this
+    this.updateStatsAfterChange();
   }
 }
