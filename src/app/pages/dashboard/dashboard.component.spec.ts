@@ -15,8 +15,13 @@ describe('DashboardComponent', () => {
   let ticketService: jasmine.SpyObj<TicketService>;
 
   beforeEach(async () => {
-    const eventServiceSpy = jasmine.createSpyObj('EventService', ['getEvent', 'registerEvent']);
-    const ticketServiceSpy = jasmine.createSpyObj('TicketService', ['generateBulkQR']);
+    const eventServiceSpy = jasmine.createSpyObj('EventService', [
+      'getEvent',
+      'registerEvent',
+    ]);
+    const ticketServiceSpy = jasmine.createSpyObj('TicketService', [
+      'generateBulkQR',
+    ]);
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent, FormsModule, HttpClientTestingModule],
@@ -29,11 +34,15 @@ describe('DashboardComponent', () => {
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     eventService = TestBed.inject(EventService) as jasmine.SpyObj<EventService>;
-    ticketService = TestBed.inject(TicketService) as jasmine.SpyObj<TicketService>;
+    ticketService = TestBed.inject(
+      TicketService
+    ) as jasmine.SpyObj<TicketService>;
 
     // Mock getEvent to return empty data initially
     eventService.getEvent.and.returnValue(of({}));
-    spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: true } as any));
+    spyOn(Swal, 'fire').and.returnValue(
+      Promise.resolve({ isConfirmed: true } as any)
+    );
 
     fixture.detectChanges();
   });
@@ -90,7 +99,9 @@ describe('DashboardComponent', () => {
       component.setActiveTab('tickets');
       fixture.detectChanges();
 
-      const ticketsContent = fixture.debugElement.query(By.css('[role="tabpanel"]'));
+      const ticketsContent = fixture.debugElement.query(
+        By.css('[role="tabpanel"]')
+      );
       expect(ticketsContent).toBeTruthy();
     });
   });
@@ -107,12 +118,14 @@ describe('DashboardComponent', () => {
         title: 'Error',
         text: 'Please create an event with valid categories first.',
         confirmButtonText: 'OK',
-      }as any);
+      } as any);
     });
 
     it('should open generate ticket modal and set default category', () => {
       component.currentEvent.id = 'EV001';
-      component.eventForm.categories = [{ name: 'VIP', price: 5000, count: 50 }];
+      component.eventForm.categories = [
+        { name: 'VIP', price: 5000, count: 50 },
+      ];
 
       component.openGenerateTicketModal();
 
@@ -134,7 +147,11 @@ describe('DashboardComponent', () => {
       expect(component.showCreateEventModal).toBeTruthy();
       expect(component.eventForm.name).toBe('');
       expect(component.eventForm.categories.length).toBe(1);
-      expect(component.eventForm.categories[0]).toEqual({ name: '', price: null, count: null });
+      expect(component.eventForm.categories[0]).toEqual({
+        name: '',
+        price: null,
+        count: null,
+      });
     });
 
     it('should close create event modal', () => {
@@ -164,7 +181,9 @@ describe('DashboardComponent', () => {
       const initialTicketCount = component.tickets.length;
       const initialSales = component.ticketStats.sales;
 
-      ticketService.generateBulkQR.and.returnValue(of(new Blob(['mock PDF'], { type: 'application/pdf' })));
+      ticketService.generateBulkQR.and.returnValue(
+        of(new Blob(['mock PDF'], { type: 'application/pdf' }))
+      );
 
       component.generateForm = {
         category: 'VIP',
@@ -188,7 +207,7 @@ describe('DashboardComponent', () => {
         text: 'Successfully generated 5 VIP tickets and downloaded PDF!',
         timer: 1500,
         showConfirmButton: false,
-      }as any);
+      } as any);
     });
 
     it('should not generate tickets with invalid data and keep button enabled', async () => {
@@ -208,13 +227,15 @@ describe('DashboardComponent', () => {
         title: 'Error',
         text: 'Please fill in all required fields for ticket generation.',
         confirmButtonText: 'OK',
-      }as any);
+      } as any);
     });
 
     it('should handle ticket generation error and re-enable button', async () => {
       const initialTicketCount = component.tickets.length;
 
-      ticketService.generateBulkQR.and.returnValue(throwError(() => new Error('API Error')));
+      ticketService.generateBulkQR.and.returnValue(
+        throwError(() => new Error('API Error'))
+      );
 
       component.generateForm = {
         category: 'VIP',
@@ -235,7 +256,7 @@ describe('DashboardComponent', () => {
         title: 'Error',
         text: 'Failed to generate QR codes. Please check the backend and try again.',
         confirmButtonText: 'OK',
-      }as any);
+      } as any);
     });
 
     it('should handle invalid category selection', async () => {
@@ -255,14 +276,17 @@ describe('DashboardComponent', () => {
         title: 'Error',
         text: 'Invalid ticket category selected: INVALID_CATEGORY. Please select a category defined for this event.',
         confirmButtonText: 'OK',
-      }as any);
+      } as any);
     });
 
     it('should update stats correctly after ticket generation', async () => {
       const initialAvailable = component.ticketStats.available;
-      const initialDashboardAvailable = component.dashboardStats.availableTickets;
+      const initialDashboardAvailable =
+        component.dashboardStats.availableTickets;
 
-      ticketService.generateBulkQR.and.returnValue(of(new Blob(['mock PDF'], { type: 'application/pdf' })));
+      ticketService.generateBulkQR.and.returnValue(
+        of(new Blob(['mock PDF'], { type: 'application/pdf' }))
+      );
 
       component.generateForm = {
         category: 'GENERAL',
@@ -272,16 +296,22 @@ describe('DashboardComponent', () => {
       await component.generateTickets();
 
       expect(component.ticketStats.available).toBe(initialAvailable - 3);
-      expect(component.dashboardStats.availableTickets).toBe(initialDashboardAvailable - 3);
+      expect(component.dashboardStats.availableTickets).toBe(
+        initialDashboardAvailable - 3
+      );
     });
 
     it('should disable generate tickets button in UI', () => {
       component.currentEvent.id = 'EV001';
-      component.eventForm.categories = [{ name: 'VIP', price: 5000, count: 50 }];
+      component.eventForm.categories = [
+        { name: 'VIP', price: 5000, count: 50 },
+      ];
       component.openGenerateTicketModal();
       fixture.detectChanges();
 
-      const button = fixture.debugElement.query(By.css('#generate-tickets-button'));
+      const button = fixture.debugElement.query(
+        By.css('#generate-tickets-button')
+      );
       if (button) {
         expect(button.nativeElement.disabled).toBeFalsy();
 
@@ -291,7 +321,9 @@ describe('DashboardComponent', () => {
         expect(button.nativeElement.disabled).toBeTruthy();
         expect(button.nativeElement.textContent).toContain('Generating...');
       } else {
-        pending('Generate tickets button not found in template. Ensure button has id="generate-tickets-button".');
+        pending(
+          'Generate tickets button not found in template. Ensure button has id="generate-tickets-button".'
+        );
       }
     });
   });
@@ -327,7 +359,7 @@ describe('DashboardComponent', () => {
         text: 'Successfully created event: Test Event!',
         timer: 1500,
         showConfirmButton: false,
-      }as any);
+      } as any);
     });
 
     it('should not create event with empty name', async () => {
@@ -346,7 +378,7 @@ describe('DashboardComponent', () => {
         title: 'Error',
         text: 'Please provide a valid event name and at least one ticket category with price and count.',
         confirmButtonText: 'OK',
-      }as any);
+      } as any);
     });
 
     it('should delete event with confirmation', async () => {
@@ -369,11 +401,13 @@ describe('DashboardComponent', () => {
         text: 'Event deleted successfully!',
         timer: 1500,
         showConfirmButton: false,
-      }as any);
+      } as any);
     });
 
     it('should not delete event without confirmation', async () => {
-      spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: false } as any));
+      spyOn(Swal, 'fire').and.returnValue(
+        Promise.resolve({ isConfirmed: false } as any)
+      );
       const originalEvent = { ...component.currentEvent };
 
       await component.deleteEvent();
@@ -385,7 +419,7 @@ describe('DashboardComponent', () => {
         text: 'Event deleted successfully!',
         timer: 1500,
         showConfirmButton: false,
-      }as any);
+      } as any);
     });
   });
 
@@ -395,8 +429,14 @@ describe('DashboardComponent', () => {
 
       component.addCategory();
 
-      expect(component.eventForm.categories.length).toBe(initialCategoryCount + 1);
-      expect(component.eventForm.categories[component.eventForm.categories.length - 1]).toEqual({
+      expect(component.eventForm.categories.length).toBe(
+        initialCategoryCount + 1
+      );
+      expect(
+        component.eventForm.categories[
+          component.eventForm.categories.length - 1
+        ]
+      ).toEqual({
         name: '',
         price: null,
         count: null,
@@ -416,25 +456,38 @@ describe('DashboardComponent', () => {
     });
 
     it('should not remove last category', () => {
-      component.eventForm.categories = [{ name: 'GENERAL', price: 100, count: 50 }];
+      component.eventForm.categories = [
+        { name: 'GENERAL', price: 100, count: 50 },
+      ];
 
       component.removeCategory(0);
 
       expect(component.eventForm.categories.length).toBe(1);
-      expect(component.eventForm.categories[0]).toEqual({ name: 'GENERAL', price: 100, count: 50 });
+      expect(component.eventForm.categories[0]).toEqual({
+        name: 'GENERAL',
+        price: 100,
+        count: 50,
+      });
     });
   });
 
   describe('Ticket Validation', () => {
     beforeEach(() => {
       component.tickets = [
-        { id: 'EV001', event: 'Test Event', name: 'User 1', category: 'VIP', status: 'Active', selected: false },
+        {
+          id: 'EV001',
+          event: 'Test Event',
+          name: 'User 1',
+          category: 'VIP',
+          status: 'Active',
+          selected: false,
+        },
       ];
     });
 
     it('should validate existing ticket', async () => {
       component.ticketIdToValidate = 'EV001';
-      await component.validateTicket();
+      await component.validateTicket('EV001');
 
       expect(Swal.fire).toHaveBeenCalledWith({
         icon: 'success',
@@ -442,13 +495,13 @@ describe('DashboardComponent', () => {
         text: 'Ticket EV001 is valid!',
         timer: 1500,
         showConfirmButton: false,
-      }as any);
+      } as any);
       expect(component.ticketIdToValidate).toBe('');
     });
 
     it('should handle non-existing ticket', async () => {
       component.ticketIdToValidate = 'INVALID';
-      await component.validateTicket();
+      await component.validateTicket('INVALID');
 
       expect(Swal.fire).toHaveBeenCalledWith({
         icon: 'error',
@@ -461,7 +514,7 @@ describe('DashboardComponent', () => {
 
     it('should handle empty ticket ID', async () => {
       component.ticketIdToValidate = '';
-      await component.validateTicket();
+      await component.validateTicket('');
 
       expect(Swal.fire).not.toHaveBeenCalled();
       expect(component.ticketIdToValidate).toBe('');
@@ -469,7 +522,7 @@ describe('DashboardComponent', () => {
 
     it('should handle whitespace-only ticket ID', async () => {
       component.ticketIdToValidate = '   ';
-      await component.validateTicket();
+      await component.validateTicket('   ');
 
       expect(Swal.fire).not.toHaveBeenCalled();
       expect(component.ticketIdToValidate).toBe('');
@@ -479,8 +532,22 @@ describe('DashboardComponent', () => {
   describe('Ticket Selection', () => {
     beforeEach(() => {
       component.tickets = [
-        { id: '1', event: 'Test Event', name: 'User 1', category: 'VIP', status: 'Active', selected: false },
-        { id: '2', event: 'Test Event', name: 'User 2', category: 'VIP', status: 'Active', selected: false },
+        {
+          id: '1',
+          event: 'Test Event',
+          name: 'User 1',
+          category: 'VIP',
+          status: 'Active',
+          selected: false,
+        },
+        {
+          id: '2',
+          event: 'Test Event',
+          name: 'User 2',
+          category: 'VIP',
+          status: 'Active',
+          selected: false,
+        },
       ];
     });
 
@@ -492,7 +559,9 @@ describe('DashboardComponent', () => {
     it('should deselect all tickets when all are selected', () => {
       component.tickets.forEach((ticket) => (ticket.selected = true));
       component.selectAllTickets();
-      expect(component.tickets.every((ticket) => !ticket.selected)).toBeTruthy();
+      expect(
+        component.tickets.every((ticket) => !ticket.selected)
+      ).toBeTruthy();
     });
 
     it('should get correct selected tickets count', () => {
@@ -515,19 +584,25 @@ describe('DashboardComponent', () => {
         text: '2 tickets deleted successfully!',
         timer: 1500,
         showConfirmButton: false,
-      }as any);
+      } as any);
     });
   });
 
   describe('UI Interactions', () => {
     it('should render header with user info', () => {
       const headerElement = fixture.debugElement.query(By.css('.header'));
-      const userInfoElement = fixture.debugElement.query(By.css('.user-info h1'));
+      const userInfoElement = fixture.debugElement.query(
+        By.css('.user-info h1')
+      );
       if (headerElement && userInfoElement) {
         expect(headerElement).toBeTruthy();
-        expect(userInfoElement.nativeElement.textContent).toContain('Welcome, Admin');
+        expect(userInfoElement.nativeElement.textContent).toContain(
+          'Welcome, Admin'
+        );
       } else {
-        pending('Header or user-info elements not found in template. Ensure .header and .user-info h1 exist.');
+        pending(
+          'Header or user-info elements not found in template. Ensure .header and .user-info h1 exist.'
+        );
       }
     });
 
@@ -539,25 +614,35 @@ describe('DashboardComponent', () => {
         expect(navItems[1].nativeElement.textContent).toContain('Tickets');
         expect(navItems[2].nativeElement.textContent).toContain('Validation');
       } else {
-        pending('Navigation tabs not found in template. Ensure .nav-item elements exist for Dashboard, Tickets, and Validation.');
+        pending(
+          'Navigation tabs not found in template. Ensure .nav-item elements exist for Dashboard, Tickets, and Validation.'
+        );
       }
     });
 
     it('should highlight active tab', () => {
-      const dashboardTab = fixture.debugElement.query(By.css('.nav-item.active'));
+      const dashboardTab = fixture.debugElement.query(
+        By.css('.nav-item.active')
+      );
       if (dashboardTab) {
         expect(dashboardTab.nativeElement.textContent).toContain('Dashboard');
       } else {
-        pending('Active tab not found in template. Ensure .nav-item.active exists.');
+        pending(
+          'Active tab not found in template. Ensure .nav-item.active exists.'
+        );
       }
     });
 
     it('should show create event button', () => {
       const createButton = fixture.debugElement.query(By.css('.btn-primary'));
       if (createButton) {
-        expect(createButton.nativeElement.textContent).toContain('Create event');
+        expect(createButton.nativeElement.textContent).toContain(
+          'Create event'
+        );
       } else {
-        pending('Create event button not found in template. Ensure .btn-primary exists.');
+        pending(
+          'Create event button not found in template. Ensure .btn-primary exists.'
+        );
       }
     });
   });
@@ -571,13 +656,17 @@ describe('DashboardComponent', () => {
       if (ticketInput) {
         expect(ticketInput).toBeTruthy();
       } else {
-        pending('Ticket ID input not found in template. Ensure #ticketIdInput exists in validation tab.');
+        pending(
+          'Ticket ID input not found in template. Ensure #ticketIdInput exists in validation tab.'
+        );
       }
     });
 
     it('should have proper modal attributes', () => {
       component.currentEvent.id = 'EV001';
-      component.eventForm.categories = [{ name: 'VIP', price: 5000, count: 50 }];
+      component.eventForm.categories = [
+        { name: 'VIP', price: 5000, count: 50 },
+      ];
       component.openGenerateTicketModal();
       fixture.detectChanges();
 
@@ -586,7 +675,9 @@ describe('DashboardComponent', () => {
         expect(modal).toBeTruthy();
         expect(modal.nativeElement.getAttribute('aria-modal')).toBe('true');
       } else {
-        pending('Modal dialog not found in template. Ensure [role="dialog"] exists for generate ticket modal.');
+        pending(
+          'Modal dialog not found in template. Ensure [role="dialog"] exists for generate ticket modal.'
+        );
       }
     });
 
@@ -600,7 +691,9 @@ describe('DashboardComponent', () => {
         expect(table).toBeTruthy();
         expect(headers.length).toBeGreaterThan(0);
       } else {
-        pending('Table or headers not found in template. Ensure [role="table"] and th[scope="col"] exist in tickets tab.');
+        pending(
+          'Table or headers not found in template. Ensure [role="table"] and th[scope="col"] exist in tickets tab.'
+        );
       }
     });
   });
@@ -639,9 +732,18 @@ describe('DashboardComponent', () => {
     it('should maintain data consistency after ticket generation', async () => {
       const initialTicketCount = component.tickets.length;
 
-      ticketService.generateBulkQR.and.returnValue(of(new Blob(['mock PDF'], { type: 'application/pdf' })));
-      component.currentEvent = { id: 'EV001', name: 'Test Event', totalCount: 100, limits: 'VIP(50)' };
-      component.eventForm.categories = [{ name: 'VIP', price: 5000, count: 50 }];
+      ticketService.generateBulkQR.and.returnValue(
+        of(new Blob(['mock PDF'], { type: 'application/pdf' }))
+      );
+      component.currentEvent = {
+        id: 'EV001',
+        name: 'Test Event',
+        totalCount: 100,
+        limits: 'VIP(50)',
+      };
+      component.eventForm.categories = [
+        { name: 'VIP', price: 5000, count: 50 },
+      ];
       component.generateForm = { category: 'VIP', count: 2 };
 
       await component.generateTickets();
@@ -653,7 +755,9 @@ describe('DashboardComponent', () => {
     it('should reset forms properly', () => {
       component.generateForm = { category: 'VIP', count: 5 };
       component.currentEvent.id = 'EV001';
-      component.eventForm.categories = [{ name: 'VIP', price: 5000, count: 50 }];
+      component.eventForm.categories = [
+        { name: 'VIP', price: 5000, count: 50 },
+      ];
 
       component.openGenerateTicketModal();
 
@@ -662,6 +766,3 @@ describe('DashboardComponent', () => {
     });
   });
 });
-
-
-

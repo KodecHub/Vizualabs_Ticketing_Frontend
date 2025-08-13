@@ -278,6 +278,12 @@
       class="table-container"
       *ngIf="validationTickets.length > 0; else noValidationTickets"
     >
+      <div class="table-header">
+        <h3>Validated Tickets ({{ getValidationListCount() }})</h3>
+        <button class="btn-outline" (click)="clearValidationList()">
+          Clear List
+        </button>
+      </div>
       <table class="data-table" role="table">
         <thead>
           <tr>

@@ -151,6 +151,11 @@ export class DashboardComponent implements OnInit {
     participants: 0,
   };
 
+  // Manual entry for Active Tickets and Ticket Sales
+  manualActiveTickets: number = 0;
+  manualTicketSales: number = 0;
+  isManualMode: boolean = false;
+
   // Ticket lists
   tickets: Ticket[] = [];
   validationTickets: Ticket[] = [];
@@ -519,12 +524,15 @@ export class DashboardComponent implements OnInit {
   // Validate a ticket by ID
   validateTicket(ticketId: string): void {
     if (ticketId) {
+      console.log(`🔍 Validating ticket: ${ticketId}`);
       this.ticketService.validateAndUseTicket(ticketId).subscribe({
         next: (response: any) => {
+          console.log(`✅ Validation response:`, response);
           if (response.valid) {
             // Fetch ticket details
             this.ticketService.getTicketById(ticketId).subscribe({
               next: (ticketDetails: any) => {
+                console.log(`📋 Ticket details:`, ticketDetails);
                 // Check if ticket is already in the list
                 const existingIndex = this.validationTickets.findIndex(
                   (t) => t.id === ticketId
@@ -541,14 +549,25 @@ export class DashboardComponent implements OnInit {
                 };
                 if (existingIndex === -1) {
                   this.validationTickets.push(ticketObj);
+                  console.log(
+                    `➕ Added ticket to validation list. Total: ${this.validationTickets.length}`
+                  );
+
+                  // Subtract from Active Tickets when new ticket is validated
+                  const ticketQuantity = ticketDetails.quantity || 1;
+                  this.subtractFromActiveTickets(ticketQuantity);
                 } else {
                   // Update status and seat range if already present
                   this.validationTickets[existingIndex].status =
                     response.status;
                   this.validationTickets[existingIndex].seatRange =
                     response.seatRange;
+                  console.log(`🔄 Updated existing ticket in validation list`);
                 }
                 this.updateStatsAfterChange();
+                console.log(
+                  `📊 Validation stats updated - Active: ${this.validationStats.activeTickets}, Participants: ${this.validationStats.participants}`
+                );
 
                 // Show success message with seat range if available
                 let successMessage = `Ticket ID: ${response.ticketId} is valid!\nRemaining Quantity: ${response.remainingQuantity}`;
@@ -557,11 +576,13 @@ export class DashboardComponent implements OnInit {
                 }
                 this.showSuccessMessage(successMessage);
               },
-              error: () => {
+              error: (error: any) => {
+                console.error(`❌ Error fetching ticket details:`, error);
                 this.showErrorMessage('Could not fetch ticket details.');
               },
             });
           } else {
+            console.log(`❌ Ticket validation failed:`, response.message);
             this.showErrorMessage(
               response.message ||
                 `Ticket ${ticketId} is invalid or already used!`
@@ -569,6 +590,7 @@ export class DashboardComponent implements OnInit {
           }
         },
         error: (error: any) => {
+          console.error(`❌ Error validating ticket:`, error);
           this.showErrorMessage(
             `Error validating ticket: ${error.message || 'Unknown error'}`
           );
@@ -693,6 +715,86 @@ export class DashboardComponent implements OnInit {
     );
     this.validationStats.activeTickets = totalSold - totalValidated;
     this.validationStats.participants = totalValidated;
+
+    console.log(
+      `📊 Stats updated - Total sold: ${totalSold}, Total validated: ${totalValidated}`
+    );
+    console.log(`📋 Validation list count: ${this.validationTickets.length}`);
+  }
+
+  // Get validation list count
+  getValidationListCount(): number {
+    return this.validationTickets.length;
+  }
+
+  // Clear validation list
+  clearValidationList(): void {
+    this.confirmAction(
+      'Are you sure you want to clear all validated tickets?'
+    ).then((confirmed) => {
+      if (confirmed) {
+        this.validationTickets = [];
+        this.updateStatsAfterChange();
+        this.showSuccessMessage('Validation list cleared successfully!');
+      }
+    });
+  }
+
+  // Enable manual mode for Active Tickets and Ticket Sales
+  enableManualMode(): void {
+    this.isManualMode = true;
+    // Set current values as starting point
+    this.manualActiveTickets = this.validationStats.activeTickets;
+    this.manualTicketSales = this.dashboardStats.ticketSales;
+  }
+
+  // Save manual values
+  saveManualValues(): void {
+    if (this.manualActiveTickets >= 0 && this.manualTicketSales >= 0) {
+      this.validationStats.activeTickets = this.manualActiveTickets;
+      this.dashboardStats.ticketSales = this.manualTicketSales;
+      this.ticketStats.sales = this.manualTicketSales;
+
+      // Recalculate available tickets
+      this.dashboardStats.availableTickets = Math.max(
+        0,
+        this.currentEvent.totalCount - this.manualTicketSales
+      );
+      this.ticketStats.available = this.dashboardStats.availableTickets;
+
+      this.isManualMode = false;
+      this.showSuccessMessage('Manual values saved successfully!');
+
+      console.log(
+        `✅ Manual values saved - Active Tickets: ${this.manualActiveTickets}, Ticket Sales: ${this.manualTicketSales}`
+      );
+    } else {
+      this.showErrorMessage(
+        'Please enter valid positive numbers for Active Tickets and Ticket Sales.'
+      );
+    }
+  }
+
+  // Cancel manual mode
+  cancelManualMode(): void {
+    this.isManualMode = false;
+    this.manualActiveTickets = this.validationStats.activeTickets;
+    this.manualTicketSales = this.dashboardStats.ticketSales;
+  }
+
+  // Subtract from Active Tickets when ticket is validated
+  subtractFromActiveTickets(quantity: number = 1): void {
+    if (this.validationStats.activeTickets >= quantity) {
+      this.validationStats.activeTickets -= quantity;
+      console.log(
+        `➖ Subtracted ${quantity} from Active Tickets. New count: ${this.validationStats.activeTickets}`
+      );
+    } else {
+      console.warn(
+        `⚠️ Cannot subtract ${quantity} from Active Tickets (current: ${this.validationStats.activeTickets})`
+      );
+      this.validationStats.activeTickets = 0; // Set to 0 if it would go negative
+    }
   }
 
   // --- QR Scanner Methods ---
@@ -748,7 +850,7 @@ export class DashboardComponent implements OnInit {
     ticketIds.forEach((ticketId) => {
       this.validateTicket(ticketId.trim());
     });
-    this.stopScanner(); 
+    this.stopScanner();
   }
 
   private async showSuccessMessage(message: string): Promise<void> {
