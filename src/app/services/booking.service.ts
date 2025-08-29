@@ -35,8 +35,8 @@ export interface TicketResponse {
   providedIn: 'root'
 })
 export class BookingService {
-  private baseUrl = 'http://localhost:8080/api/tickets';
-  private transactionUrl = 'http://localhost:8080/api/transactions'; 
+  private baseUrl = 'https//vizualabs.shop/api/tickets';
+  private transactionUrl = 'https//vizualabs.shop/api/transactions'; 
   
   constructor(private http: HttpClient) {}
 
