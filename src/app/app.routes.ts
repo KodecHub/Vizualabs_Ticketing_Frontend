@@ -1,33 +1,49 @@
 import { Routes } from '@angular/router';
 import { BannerComponent } from './pages/banner/banner.component';
+import { authGuard, authMatchGuard } from './services/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    component: BannerComponent
+    component: BannerComponent,
   },
   {
     path: 'admin',
-    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
+    loadComponent: () =>
+      import('./pages/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
+    loadComponent: () =>
+      import('./pages/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      ),
+    canActivate: [authGuard],
+    canMatch: [authMatchGuard],
   },
   {
     path: 'booking',
-    loadComponent: () => import('./pages/booking/booking.component').then(m => m.BookingComponent)
+    loadComponent: () =>
+      import('./pages/booking/booking.component').then(
+        (m) => m.BookingComponent
+      ),
   },
   {
     path: 'terms-and-conditions',
-    loadComponent: () => import('./pages/terms-and-conditions/terms-and-conditions.component').then(m => m.TermsAndConditionsComponent)
+    loadComponent: () =>
+      import(
+        './pages/terms-and-conditions/terms-and-conditions.component'
+      ).then((m) => m.TermsAndConditionsComponent),
   },
   {
     path: 'privacy-policy',
-    loadComponent: () => import('./pages/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent)
+    loadComponent: () =>
+      import('./pages/privacy-policy/privacy-policy.component').then(
+        (m) => m.PrivacyPolicyComponent
+      ),
   },
   {
     path: '**',
-    redirectTo: '/'
-  }
+    redirectTo: '/',
+  },
 ];
