@@ -9,7 +9,7 @@ export interface TicketRequest {
   nic: string;
   eventId: string;
   categoryQuantities: { [key: number]: number };
-  totalAmount: number; 
+  totalAmount: number;
   transactionId: any;
 }
 
@@ -32,12 +32,12 @@ export interface TicketResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BookingService {
-  private baseUrl = 'http://localhost:8080/api/tickets';
-  private transactionUrl = 'http://localhost:8080/api/transactions'; 
-  
+  private baseUrl = 'https://vizualabs.shop/api/tickets';
+  private transactionUrl = 'https://vizualabs.shop/api/transactions';
+
   constructor(private http: HttpClient) {}
 
   bookTicket(request: TicketRequest): Observable<TicketResponse> {
@@ -47,5 +47,4 @@ export class BookingService {
   createTransaction(payload: any): Observable<any> {
     return this.http.post<any>(this.transactionUrl, payload);
   }
-
 }

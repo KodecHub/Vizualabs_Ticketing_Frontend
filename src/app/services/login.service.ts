@@ -7,18 +7,16 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class LoginService {
-  private apiUrl = 'http://localhost:8080/api/login'; 
+  private apiUrl = 'https://vizualabs.shop/api/login';
 
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<boolean> {
-    return this.http
-      .post<boolean>(this.apiUrl, { email, password })
-      .pipe(
-        catchError((error) => {
-          console.error('Login error:', error);
-          return throwError(() => new Error('Login failed'));
-        })
-      );
+    return this.http.post<boolean>(this.apiUrl, { email, password }).pipe(
+      catchError((error) => {
+        console.error('Login error:', error);
+        return throwError(() => new Error('Login failed'));
+      })
+    );
   }
 }
